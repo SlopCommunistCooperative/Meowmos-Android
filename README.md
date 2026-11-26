@@ -33,6 +33,19 @@ Meowmos is an independent fork of [Moe Memos Android](https://github.com/mudkipm
 
 Meowmos is built with Kotlin and Jetpack Compose.
 
+### Signing GitHub releases
+
+In GitHub, open **Settings → Environments → release-signing**. Keep required reviewers enabled and restrict deployments to `main`. Add these as environment secrets, not repository secrets:
+
+- `ANDROID_KEYSTORE_BASE64`: the original release keystore, base64-encoded.
+- `ANDROID_SIGNING_STORE_PASSWORD`: the keystore password.
+- `ANDROID_SIGNING_KEY_ALIAS`: the key alias.
+- `ANDROID_SIGNING_KEY_PASSWORD`: the private key password.
+
+Run **Build Signed Release APK** from `main` and enter an existing tag such as `v2.3.0`. The workflow builds the tagged commit without signing credentials. Review the source commit and approve the `release-signing` job. That job signs without running the project's build scripts. The publish job attaches the signed APK without replacing existing assets.
+
+Pushes to `main` use the same approval gate before updating the rolling pre-release. You can also run the workflow manually with no tag to update it.
+
 ## License
 
 Meowmos is licensed under [GPLv3](LICENSE).
