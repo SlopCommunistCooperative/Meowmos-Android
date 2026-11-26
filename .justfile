@@ -1,4 +1,4 @@
-# Justfile for MoeMemosAndroid
+# Justfile for Meowmos Android
 # https://github.com/casey/just
 
 # List available commands

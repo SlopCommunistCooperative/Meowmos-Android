@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">MoeMemos</string>
+    <string name="app_name">Meowmos</string>
     <string name="search">Recherche</string>
     <string name="back">Retour</string>
     <string name="memos">Memos</string>
@@ -20,7 +20,7 @@
     <string name="acknowledgements">Remerciements</string>
     <string name="privacy_policy">Politique de confidentialité</string>
     <string name="website">Website</string>
-    <string name="about">À propos de Moe Memos</string>
+    <string name="about">À propos de Meowmos</string>
     <string name="add_account">S\'identifier</string>
     <string name="attachment">Pièce jointe</string>
     <string name="account_selected">Sélectionné</string>
@@ -53,10 +53,10 @@
     <string name="invalid_server">Serveur invalide.</string>
     <string name="access_token_invalid_relogin">Votre jeton d\'accès est invalide, veuillez créer un jeton d\'accès sans expiration et vous reconnecter.</string>
     <string name="sync_failed">Échec de la synchronisation</string>
-    <string name="memos_supported_versions">Moe Memos prend uniquement en charge Memos %1$s et Memos %2$s à %3$s.</string>
+    <string name="memos_supported_versions">Meowmos prend uniquement en charge Memos %1$s et Memos %2$s à %3$s.</string>
     <string name="unsupported_memos_version_title">Version de Memos non prise en charge</string>
-    <string name="memos_login_version_higher_warning">Votre version de Memos est supérieure aux versions prises en charge par Moe Memos. Des problèmes de compatibilité peuvent survenir. Veuillez consulter le site de Moe Memos avant de continuer.</string>
-    <string name="memos_sync_version_higher_warning">Votre version de Memos est supérieure aux versions prises en charge par Moe Memos. Forcer la synchronisation peut corrompre les données non synchronisées. Veuillez consulter le site de Moe Memos avant de continuer.</string>
+    <string name="memos_login_version_higher_warning">Votre version de Memos est supérieure aux versions prises en charge par Meowmos. Des problèmes de compatibilité peuvent survenir. Veuillez consulter le site de Meowmos avant de continuer.</string>
+    <string name="memos_sync_version_higher_warning">Votre version de Memos est supérieure aux versions prises en charge par Meowmos. Forcer la synchronisation peut corrompre les données non synchronisées. Veuillez consulter le site de Meowmos avant de continuer.</string>
     <string name="still_login">Se connecter quand même</string>
     <string name="still_sync">Synchroniser quand même</string>
     <string name="pin">Épingler</string>
@@ -102,8 +102,8 @@
     <!-- App lock strings -->
     <string name="security">Sécurité</string>
     <string name="app_lock">Verrouillage de l’application</string>
-    <string name="app_lock_summary">Exiger l’empreinte digitale, la reconnaissance faciale ou le code de l’appareil à l’ouverture de Moe Memos.</string>
-    <string name="app_lock_prompt_title">Déverrouiller Moe Memos</string>
+    <string name="app_lock_summary">Exiger l’empreinte digitale, la reconnaissance faciale ou le code de l’appareil à l’ouverture de Meowmos.</string>
+    <string name="app_lock_prompt_title">Déverrouiller Meowmos</string>
     <string name="app_lock_prompt_subtitle">Confirmez votre identité pour continuer.</string>
     <string name="app_lock_prompt_failed">Impossible de démarrer l’authentification système.</string>
     <string name="app_lock_authentication_required">Une authentification est nécessaire pour afficher vos memos.</string>

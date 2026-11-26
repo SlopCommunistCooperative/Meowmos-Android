@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">MoeMemos</string>
+    <string name="app_name">Meowmos</string>
     <string name="search">搜索</string>
     <string name="back">返回</string>
     <string name="memos">灵感</string>
@@ -20,7 +20,7 @@
     <string name="acknowledgements">致谢</string>
     <string name="privacy_policy">隐私政策</string>
     <string name="website">官网</string>
-    <string name="about">关于 Moe Memos</string>
+    <string name="about">关于 Meowmos</string>
     <string name="add_account">登录</string>
     <string name="attachment">附件</string>
     <string name="account_selected">已选择</string>
@@ -53,10 +53,10 @@
     <string name="invalid_server">无效的服务器。</string>
     <string name="access_token_invalid_relogin">你的 Access Token 无效，请创建一个永不过期的 Access Token 并重新登录。</string>
     <string name="sync_failed">同步失败</string>
-    <string name="memos_supported_versions">Moe Memos 仅支持 Memos %1$s 和 Memos %2$s 至 %3$s。</string>
+    <string name="memos_supported_versions">Meowmos 仅支持 Memos %1$s 和 Memos %2$s 至 %3$s。</string>
     <string name="unsupported_memos_version_title">不受支持的 Memos 版本</string>
-    <string name="memos_login_version_higher_warning">你的 Memos 版本高于 Moe Memos 支持的版本，可能存在兼容性问题。继续之前请先查看 Moe Memos 网站确认是否支持该版本。</string>
-    <string name="memos_sync_version_higher_warning">你的 Memos 版本高于 Moe Memos 支持的版本，强制同步可能会损坏未同步的数据。继续之前请先查看 Moe Memos 网站确认是否支持该版本。</string>
+    <string name="memos_login_version_higher_warning">你的 Memos 版本高于 Meowmos 支持的版本，可能存在兼容性问题。继续之前请先查看 Meowmos 网站确认是否支持该版本。</string>
+    <string name="memos_sync_version_higher_warning">你的 Memos 版本高于 Meowmos 支持的版本，强制同步可能会损坏未同步的数据。继续之前请先查看 Meowmos 网站确认是否支持该版本。</string>
     <string name="still_login">仍然登录</string>
     <string name="still_sync">仍然同步</string>
     <string name="pin">置顶</string>
@@ -94,7 +94,7 @@
     <string name="local_export_failed">导出本地数据失败</string>
     <string name="import_local_account">导入本地数据</string>
     <string name="restore_local_backup">恢复</string>
-    <string name="local_backup_description">将本地 MEMO 和附件导出为备份。可将 Moe Memos 的本地导出文件（包括旧版导出文件）恢复到此设备的本地账户。</string>
+    <string name="local_backup_description">将本地 MEMO 和附件导出为备份。可将 Meowmos 的本地导出文件（包括旧版导出文件）恢复到此设备的本地账户。</string>
     <string name="local_backup_processing">正在处理本地备份…</string>
     <string name="local_backup_failed">无法完成本地备份操作</string>
     <string name="local_import_preview">此备份包含 %1$d 条 MEMO 和 %2$d 个附件。</string>
@@ -114,8 +114,8 @@
     <!-- App lock strings -->
     <string name="security">安全</string>
     <string name="app_lock">应用锁</string>
-    <string name="app_lock_summary">打开 Moe Memos 时需要指纹、人脸或设备密码验证。</string>
-    <string name="app_lock_prompt_title">解锁 Moe Memos</string>
+    <string name="app_lock_summary">打开 Meowmos 时需要指纹、人脸或设备密码验证。</string>
+    <string name="app_lock_prompt_title">解锁 Meowmos</string>
     <string name="app_lock_prompt_subtitle">请确认是你本人以继续。</string>
     <string name="app_lock_prompt_failed">无法启动系统验证。</string>
     <string name="app_lock_authentication_required">需要验证后才能查看你的 MEMO。</string>
@@ -164,10 +164,13 @@
     <string name="change_certificate">更换证书</string>
     <string name="remove_client_certificate">移除客户端证书</string>
     <string name="remove_client_certificate_title">移除客户端证书？</string>
-    <string name="remove_client_certificate_message">Moe Memos 将不再使用已选择的客户端证书。</string>
+    <string name="remove_client_certificate_message">Meowmos 将不再使用已选择的客户端证书。</string>
 
     <!-- 可见性与搜索 -->
     <string name="memo_visibility_space">空间成员可见</string>
+    <string name="memo_no_space">不归入空间</string>
+    <string name="memo_select_space">选择发布空间</string>
+    <string name="memo_space_unavailable">上次选择的空间已不可用。这条笔记仅自己可见。</string>
     <string name="search_include_archived">搜索包含归档</string>
     <string name="search_include_archived_summary">搜索结果也显示匹配的归档 MEMO</string>
 

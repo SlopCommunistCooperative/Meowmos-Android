@@ -72,19 +72,19 @@ jobs:
             echo "APK not found at $APK_PATH"
             exit 1
           fi
-          cp "$APK_PATH" "moememos-main.apk"
+          cp "$APK_PATH" "meowmos-main.apk"
 
       - name: Upload workflow artifact
         uses: actions/upload-artifact@v4
         with:
-          name: moememos-main-${{ github.sha }}
-          path: moememos-main.apk
+          name: meowmos-main-${{ github.sha }}
+          path: meowmos-main.apk
 
       - name: Publish rolling pre-release
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: pre-release
-          APK_NAME: moememos-main.apk
+          APK_NAME: meowmos-main.apk
         run: |
           set -u
 

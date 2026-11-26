@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">MoeMemos</string>
+    <string name="app_name">Meowmos</string>
     <string name="search">Buscar</string>
     <string name="back">Volver</string>
     <string name="memos">Notas</string>
@@ -21,7 +21,7 @@
     <string name="acknowledgements">Agradecimientos</string>
     <string name="privacy_policy">Política de privacidad</string>
     <string name="website">Sitio web</string>
-    <string name="about">Acerca de Moe Memos</string>
+    <string name="about">Acerca de Meowmos</string>
     <string name="add_account">Añadir cuenta</string>
     <string name="attachment">Archivo adjunto</string>
     <string name="account_selected">Seleccionada</string>
@@ -39,7 +39,7 @@
     <string name="change_certificate">Cambiar certificado</string>
     <string name="remove_client_certificate">Quitar certificado de cliente</string>
     <string name="remove_client_certificate_title">¿Quitar el certificado de cliente?</string>
-    <string name="remove_client_certificate_message">Moe Memos dejará de usar el certificado de cliente seleccionado.</string>
+    <string name="remove_client_certificate_message">Meowmos dejará de usar el certificado de cliente seleccionado.</string>
     <string name="edit">Editar</string>
     <string name="close">Cerrar</string>
     <string name="save_changes_title">¿Guardar los cambios?</string>
@@ -62,10 +62,10 @@
     <string name="invalid_server">Servidor no válido.</string>
     <string name="access_token_invalid_relogin">Tu token de acceso no es válido. Crea un token de acceso sin caducidad y vuelve a iniciar sesión.</string>
     <string name="sync_failed">Error de sincronización</string>
-    <string name="memos_supported_versions">Moe Memos solo es compatible con Memos %1$s y con las versiones de Memos de la %2$s a la %3$s.</string>
+    <string name="memos_supported_versions">Meowmos solo es compatible con Memos %1$s y con las versiones de Memos de la %2$s a la %3$s.</string>
     <string name="unsupported_memos_version_title">Versión de Memos no compatible</string>
-    <string name="memos_login_version_higher_warning">Tu versión de Memos es más reciente que las versiones compatibles con Moe Memos. Pueden producirse problemas de compatibilidad. Consulta el sitio web de Moe Memos antes de continuar.</string>
-    <string name="memos_sync_version_higher_warning">Tu versión de Memos es más reciente que las versiones compatibles con Moe Memos. Forzar la sincronización puede dañar los datos sin sincronizar. Consulta el sitio web de Moe Memos antes de continuar.</string>
+    <string name="memos_login_version_higher_warning">Tu versión de Memos es más reciente que las versiones compatibles con Meowmos. Pueden producirse problemas de compatibilidad. Consulta el sitio web de Meowmos antes de continuar.</string>
+    <string name="memos_sync_version_higher_warning">Tu versión de Memos es más reciente que las versiones compatibles con Meowmos. Forzar la sincronización puede dañar los datos sin sincronizar. Consulta el sitio web de Meowmos antes de continuar.</string>
     <string name="still_login">Iniciar sesión de todos modos</string>
     <string name="still_sync">Sincronizar de todos modos</string>
     <string name="pin">Fijar</string>
@@ -108,7 +108,7 @@
     <string name="local_export_failed">No se han podido exportar los datos locales</string>
     <string name="import_local_account">Importar datos locales</string>
     <string name="restore_local_backup">Restaurar</string>
-    <string name="local_backup_description">Exporta tus notas locales y sus archivos adjuntos como copia de seguridad. Restaura en la cuenta local de este dispositivo una exportación local de Moe Memos, incluidas las exportaciones antiguas.</string>
+    <string name="local_backup_description">Exporta tus notas locales y sus archivos adjuntos como copia de seguridad. Restaura en la cuenta local de este dispositivo una exportación local de Meowmos, incluidas las exportaciones antiguas.</string>
     <string name="local_backup_processing">Procesando copia de seguridad local…</string>
     <string name="local_backup_failed">No se ha podido completar la operación de copia de seguridad local</string>
     <string name="local_import_preview">Notas: %1$d\nArchivos adjuntos: %2$d</string>
@@ -127,8 +127,8 @@
     <!-- App lock strings -->
     <string name="security">Seguridad</string>
     <string name="app_lock">Bloqueo de la app</string>
-    <string name="app_lock_summary">Solicita huella, reconocimiento facial o contraseña del dispositivo al abrir Moe Memos.</string>
-    <string name="app_lock_prompt_title">Desbloquear Moe Memos</string>
+    <string name="app_lock_summary">Solicita huella, reconocimiento facial o contraseña del dispositivo al abrir Meowmos.</string>
+    <string name="app_lock_prompt_title">Desbloquear Meowmos</string>
     <string name="app_lock_prompt_subtitle">Confirma tu identidad para continuar.</string>
     <string name="app_lock_prompt_failed">No se ha podido iniciar la autenticación del sistema.</string>
     <string name="app_lock_authentication_required">Debes autenticarte para ver tus notas.</string>

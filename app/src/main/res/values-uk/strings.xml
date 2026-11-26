@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">MoeMemos</string>
+    <string name="app_name">Meowmos</string>
     <string name="search">Пошук</string>
     <string name="back">Назад</string>
     <string name="memos">Memos</string>
@@ -20,7 +20,7 @@
     <string name="acknowledgements">Ліцензії</string>
     <string name="privacy_policy">Політика конфіденційності</string>
     <string name="website">Веб-сайт</string>
-    <string name="about">Про Moe Memos</string>
+    <string name="about">Про Meowmos</string>
     <string name="add_account">Увійти в систему</string>
     <string name="attachment">Вкладення</string>
     <string name="account_selected">Обрано</string>
@@ -53,10 +53,10 @@
     <string name="invalid_server">Неприпустимий сервер.</string>
     <string name="access_token_invalid_relogin">Ваш токен доступа недійсний. Створіть токен доступа без терміну дії та увійдіть знову.</string>
     <string name="sync_failed">Невдала синхронізація</string>
-    <string name="memos_supported_versions">Moe Memos підтримує виключно Memos %1$s та Memos %2$s–%3$s.</string>
+    <string name="memos_supported_versions">Meowmos підтримує виключно Memos %1$s та Memos %2$s–%3$s.</string>
     <string name="unsupported_memos_version_title">Непідтримувана версія Memos</string>
-    <string name="memos_login_version_higher_warning">Ваша версія Memos вища за підтримувані версії Moe Memos. Можливі проблеми сусності. Перед продовженням перевірте сайт Moe Memos.</string>
-    <string name="memos_sync_version_higher_warning">Ваша версія Memos вища за підтримувані версії Moe Memos. Примусова синхронізація може пошкодити несинхронізовані дані. Перед продовженням перевірте сайт Moe Memos.</string>
+    <string name="memos_login_version_higher_warning">Ваша версія Memos вища за підтримувані версії Meowmos. Можливі проблеми сусності. Перед продовженням перевірте сайт Meowmos.</string>
+    <string name="memos_sync_version_higher_warning">Ваша версія Memos вища за підтримувані версії Meowmos. Примусова синхронізація може пошкодити несинхронізовані дані. Перед продовженням перевірте сайт Meowmos.</string>
     <string name="still_login">Все одно увійти</string>
     <string name="still_sync">Все одно синхронізувати</string>
     <string name="pin">Закріпити</string>
@@ -102,8 +102,8 @@
     <!-- App lock strings -->
     <string name="security">Безпека</string>
     <string name="app_lock">Блокування додатку</string>
-    <string name="app_lock_summary">Вимагати відбиток пальця, розпізнавання особи або пароль пристрою при відкриванні Moe Memos.</string>
-    <string name="app_lock_prompt_title">Розблокувати Moe Memos</string>
+    <string name="app_lock_summary">Вимагати відбиток пальця, розпізнавання особи або пароль пристрою при відкриванні Meowmos.</string>
+    <string name="app_lock_prompt_title">Розблокувати Meowmos</string>
     <string name="app_lock_prompt_subtitle">Підтвердіть, що це ви, щоб продовжити.</string>
     <string name="app_lock_prompt_failed">Не вдалося запустити системну автентифікацію.</string>
     <string name="app_lock_authentication_required">Для перегляду ваших нотаток потрібна автентифікація.</string>

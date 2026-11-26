@@ -1,0 +1,22 @@
+package io.github.slopcommunistcooperative.meowmos.data.model
+
+import kotlinx.serialization.Serializable
+
+@Serializable
+enum class MemoEditGesture {
+    NONE,
+    SINGLE,
+    DOUBLE,
+    LONG,
+}
+
+@Serializable
+data class UserSettings(
+    val draft: String = "",
+    val acceptedUnsupportedSyncVersions: List<String> = emptyList(),
+    val editGesture: MemoEditGesture = MemoEditGesture.NONE,
+    val autosave: Boolean = false,
+    val draftLocation: MemoLocation? = null,
+    val searchIncludesArchived: Boolean = false,
+    val lastMemoSpace: MemoSpace? = null,
+)

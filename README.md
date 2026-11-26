@@ -1,46 +1,37 @@
-# Moe Memos
+# Meowmos
 
 [![justforfunnoreally.dev badge](https://img.shields.io/badge/justforfunnoreally-dev-9ff)](https://justforfunnoreally.dev)
 
-<img alt="Moe Memos" src="https://memos.moe/memos.png" width="160" height="160" />
+<img alt="Meowmos" src="fastlane/metadata/android/en-US/images/icon.png" width="160" height="160" />
 
-**Moe Memos** is an app to help you capture thoughts and ideas.
+Meowmos is an Android app for writing and organizing notes.
 
-You can use Moe Memos with either a self-hosted [✍️memos](https://github.com/usememos/memos) server or locally on your device (no server required).
+Use Meowmos with a self-hosted [Memos](https://github.com/usememos/memos) server or locally on your device.
 
-**Note: Current Moe Memos version supports Memos 0.21.0, Memos 0.27.0 to 0.31.0, and Memos 26.10 to 26.11.2. Memos update may introduce breaking API changes. If you are using an unsupported version, it is recommended to use [Mortis](https://github.com/mudkipme/mortis) to convert the newer Memos API to the Memos 0.21.0 API and re-login in Moe Memos.**
+Meowmos supports Memos 0.21.0, 0.27.0 through 0.31.0, and 26.10 through 26.11.2. Newer releases can break compatibility. [Mortis](https://github.com/mudkipme/mortis) can translate newer APIs to the Memos 0.21.0 API.
 
 ## Installation
 
-[<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
-     alt="Get it on F-Droid"
-     height="80">](https://f-droid.org/packages/me.mudkip.moememos/)
-[<img src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png"
-     alt="Get it on Google Play"
-     height="80">](https://play.google.com/store/apps/details?id=me.mudkip.moememos)
-
-Or download and install the APK package from the [Releases section](https://github.com/mudkipme/MoeMemosAndroid/releases/latest).
+Download the APK from [Meowmos releases](https://github.com/SlopCommunistCooperative/Meowmos-Android/releases).
 
 ## Features
 
-- Write memos like tweeting to yourself
-- Use Moe Memos locally on your device (with backup and restore) or sync with your own ✍️memos server
-- Offline-first experience with automatic sync when you are back online
-- Material You design with dynamic themes and themed icon
-- Rich memo content: Markdown editor and renderer, images, non-image attachments, and to-do items
-- Organize and find memos with tags, pinning, and search
-- Home screen widget and share sheet integration (text, images, and webpages)
-- View your memo activity with a progress graph
-- Full privacy protection, no data collection
+- Back up and restore local notes.
+- Write offline and sync when you're back online.
+- On servers that support Spaces, use the menu next to Post to choose a space you belong to. Meowmos remembers that choice for new notes on the same account. Until you choose a space, new notes have no space. Selecting a space defaults the note's visibility to its members.
+- Use Material You themes and a themed app icon.
+- Write and preview Markdown, add images and files, and check off tasks.
+- Find notes with search and tags. Pin notes you want to keep at the top.
+- Open notes from the home screen widget. Share text, images, and web links to Meowmos from other apps.
+- See your note activity in a graph.
+- Meowmos does not collect your data.
 
-Moe Memos is a third-party client for [✍️memos](https://github.com/usememos/memos) and both projects aren't affiliated with each other.
+Meowmos is an independent fork of [Moe Memos Android](https://github.com/mudkipme/MoeMemosAndroid) and is not affiliated with the Memos server project.
 
 ## Development
 
-Moe Memos tends to keep minimal and optimized for best native experience. The Android version is developed with Kotlin and Jetpack Compose.
-
-Any contributions are greatly appreciated.
+Meowmos is built with Kotlin and Jetpack Compose.
 
 ## License
 
-The Android version of Moe Memos is under [GPLv3](LICENSE).
+Meowmos is licensed under [GPLv3](LICENSE).

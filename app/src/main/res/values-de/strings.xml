@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">MoeMemos</string>
+    <string name="app_name">Meowmos</string>
     <string name="search">Suche</string>
     <string name="back">Zurück</string>
     <string name="memos">Memos</string>
@@ -20,7 +20,7 @@
     <string name="acknowledgements">Abhängigkeiten</string>
     <string name="privacy_policy">Datenschutzerklärung</string>
     <string name="website">Webseite</string>
-    <string name="about">Über Moe Memos</string>
+    <string name="about">Über Meowmos</string>
     <string name="add_account">Account hinzufügen</string>
     <string name="attachment">Anhang</string>
     <string name="account_selected">Ausgewählt</string>
@@ -38,7 +38,7 @@
     <string name="change_certificate">Zertifikat ändern</string>
     <string name="remove_client_certificate">Clientzertifikat entfernen</string>
     <string name="remove_client_certificate_title">Clientzertifikat entfernen?</string>
-    <string name="remove_client_certificate_message">Moe Memos wird das ausgewählte Clientzertifikat nicht mehr verwenden.</string>
+    <string name="remove_client_certificate_message">Meowmos wird das ausgewählte Clientzertifikat nicht mehr verwenden.</string>
     <string name="edit">Bearbeiten</string>
     <string name="close">Schließen</string>
     <string name="save_changes_title">Änderungen speichern?</string>
@@ -61,10 +61,10 @@
     <string name="invalid_server">Ungültiger Server.</string>
     <string name="access_token_invalid_relogin">Dein Zugriffstoken ist ungültig. Bitte erstelle einen nicht ablaufenden Zugriffstoken und melde dich erneut an.</string>
     <string name="sync_failed">Synchronisierung fehlgeschlagen</string>
-    <string name="memos_supported_versions">Moe Memos unterstützt nur Memos %1$s und Memos %2$s bis %3$s.</string>
+    <string name="memos_supported_versions">Meowmos unterstützt nur Memos %1$s und Memos %2$s bis %3$s.</string>
     <string name="unsupported_memos_version_title">Nicht unterstützte Memos-Version</string>
-    <string name="memos_login_version_higher_warning">Deine Memos-Version ist höher als die von Moe Memos unterstützten Versionen. Es kann zu Kompatibilitätsproblemen kommen. Bitte prüfe vor dem Fortfahren die Website von Moe Memos.</string>
-    <string name="memos_sync_version_higher_warning">Deine Memos-Version ist höher als die von Moe Memos unterstützten Versionen. Erzwungenes Synchronisieren kann nicht synchronisierte Daten beschädigen. Bitte prüfe vor dem Fortfahren die Website von Moe Memos.</string>
+    <string name="memos_login_version_higher_warning">Deine Memos-Version ist höher als die von Meowmos unterstützten Versionen. Es kann zu Kompatibilitätsproblemen kommen. Bitte prüfe vor dem Fortfahren die Website von Meowmos.</string>
+    <string name="memos_sync_version_higher_warning">Deine Memos-Version ist höher als die von Meowmos unterstützten Versionen. Erzwungenes Synchronisieren kann nicht synchronisierte Daten beschädigen. Bitte prüfe vor dem Fortfahren die Website von Meowmos.</string>
     <string name="still_login">Trotzdem anmelden</string>
     <string name="still_sync">Trotzdem synchronisieren</string>
     <string name="pin">Anpinnen</string>
@@ -114,8 +114,8 @@
     <!-- App lock strings -->
     <string name="security">Sicherheit</string>
     <string name="app_lock">App-Sperre</string>
-    <string name="app_lock_summary">Beim Öffnen von Moe Memos Fingerabdruck, Gesichtserkennung oder Geräte-PIN verlangen.</string>
-    <string name="app_lock_prompt_title">Moe Memos entsperren</string>
+    <string name="app_lock_summary">Beim Öffnen von Meowmos Fingerabdruck, Gesichtserkennung oder Geräte-PIN verlangen.</string>
+    <string name="app_lock_prompt_title">Meowmos entsperren</string>
     <string name="app_lock_prompt_subtitle">Bestätige deine Identität, um fortzufahren.</string>
     <string name="app_lock_prompt_failed">Systemauthentifizierung konnte nicht gestartet werden.</string>
     <string name="app_lock_authentication_required">Authentifizierung ist erforderlich, um deine Memos anzuzeigen.</string>

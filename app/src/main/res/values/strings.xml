@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">MoeMemos</string>
+    <string name="app_name">Meowmos</string>
     <string name="search">Search</string>
     <string name="back">Back</string>
     <string name="memos">Memos</string>
@@ -21,10 +21,9 @@
     <string name="acknowledgements">Acknowledgements</string>
     <string name="privacy_policy">Privacy Policy</string>
     <string name="website">Website</string>
-    <string name="about">About Moe Memos</string>
+    <string name="about">About Meowmos</string>
     <string name="add_account">Add Account</string>
     <string name="attachment">Attachment</string>
-    <string name="moe_memos" translatable="false">Moe Memos</string>
     <string name="account_selected">Selected</string>
     <string name="report_an_issue">Report an Issue</string>
     <string name="unpin">Unpin</string>
@@ -40,7 +39,7 @@
     <string name="change_certificate">Change certificate</string>
     <string name="remove_client_certificate">Remove client certificate</string>
     <string name="remove_client_certificate_title">Remove client certificate?</string>
-    <string name="remove_client_certificate_message">Moe Memos will no longer use the selected client certificate.</string>
+    <string name="remove_client_certificate_message">Meowmos will no longer use the selected client certificate.</string>
     <string name="edit">Edit</string>
     <string name="close">Close</string>
     <string name="save_changes_title">Save Changes?</string>
@@ -66,10 +65,10 @@
     <string name="invalid_server">Invalid server.</string>
     <string name="access_token_invalid_relogin">Your access token is invalid, please create a never expire access token and login again.</string>
     <string name="sync_failed">Sync Failed</string>
-    <string name="memos_supported_versions">Moe Memos only supports Memos %1$s and Memos %2$s to %3$s.</string>
+    <string name="memos_supported_versions">Meowmos only supports Memos %1$s and Memos %2$s to %3$s.</string>
     <string name="unsupported_memos_version_title">Unsupported Memos Version</string>
-    <string name="memos_login_version_higher_warning">Your Memos version is higher than the versions supported by Moe Memos. Compatibility issues may happen. Check the Moe Memos website before continuing.</string>
-    <string name="memos_sync_version_higher_warning">Your Memos version is higher than the versions supported by Moe Memos. Force sync may corrupt unsynced data. Check the Moe Memos website before continuing.</string>
+    <string name="memos_login_version_higher_warning">Your Memos version is higher than the versions supported by Meowmos. Compatibility issues may happen. Check the Meowmos website before continuing.</string>
+    <string name="memos_sync_version_higher_warning">Your Memos version is higher than the versions supported by Meowmos. Force sync may corrupt unsynced data. Check the Meowmos website before continuing.</string>
     <string name="still_login">Still login</string>
     <string name="still_sync">Still Sync</string>
     <string name="pin">Pin</string>
@@ -82,6 +81,9 @@
     <string name="memo_visibility_protected">Visible to local members</string>
     <string name="memo_visibility_private">Only visible to you</string>
     <string name="memo_visibility_space">Visible to space members</string>
+    <string name="memo_no_space">No space</string>
+    <string name="memo_select_space">Choose posting space</string>
+    <string name="memo_space_unavailable">The last space is no longer available. This note is private.</string>
     <string name="explore">Explore</string>
     <string name="view_more">View More</string>
     <string name="accounts">Accounts</string>
@@ -112,7 +114,7 @@
     <string name="local_export_failed">Failed to export local data</string>
     <string name="import_local_account">Import Local Data</string>
     <string name="restore_local_backup">Restore</string>
-    <string name="local_backup_description">Export your local memos and attachments as a backup. Restore a Moe Memos local export, including older exports, into this device’s local account.</string>
+    <string name="local_backup_description">Export your local memos and attachments as a backup. Restore a Meowmos local export, including older exports, into this device’s local account.</string>
     <string name="local_backup_processing">Processing local backup…</string>
     <string name="local_backup_failed">Could not complete local backup operation</string>
     <string name="local_import_preview">Memos: %1$d\nAttachments: %2$d</string>
@@ -131,8 +133,8 @@
     <!-- App lock strings -->
     <string name="security">Security</string>
     <string name="app_lock">App lock</string>
-    <string name="app_lock_summary">Require fingerprint, face unlock, or device password when opening Moe Memos.</string>
-    <string name="app_lock_prompt_title">Unlock Moe Memos</string>
+    <string name="app_lock_summary">Require fingerprint, face unlock, or device password when opening Meowmos.</string>
+    <string name="app_lock_prompt_title">Unlock Meowmos</string>
     <string name="app_lock_prompt_subtitle">Confirm it is you to continue.</string>
     <string name="app_lock_prompt_failed">Could not start system authentication.</string>
     <string name="app_lock_authentication_required">Authentication is required to view your memos.</string>
