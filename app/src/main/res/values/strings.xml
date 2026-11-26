@@ -81,6 +81,15 @@
     <string name="memo_visibility_protected">Visible to local members</string>
     <string name="memo_visibility_private">Only visible to you</string>
     <string name="memo_visibility_space">Visible to space members</string>
+    <string name="memo_comments">Comments</string>
+    <string name="memo_comment_reply">Reply</string>
+    <string name="memo_comment_write">Write a comment</string>
+    <string name="memo_comment_post">Post comment</string>
+    <string name="memo_comment_visibility">Who can see this? %1$s</string>
+    <string name="memo_comment_view_all">View all comments</string>
+    <string name="memo_comment_load_failed">Could not load comments.</string>
+    <string name="memo_comment_post_failed">Could not post your comment. Try again.</string>
+    <string name="memo_comment_hide">Hide comments</string>
     <string name="memo_no_space">No space</string>
     <string name="memo_select_space">Choose posting space</string>
     <string name="memo_space_unavailable">The last space is no longer available. This note is private.</string>
@@ -205,4 +214,17 @@
     <string name="sync_resource_failed">Failed to sync resource</string>
     <string name="sync_delete_resource_failed">Failed to delete resource on server</string>
     <string name="attachment_upload_failed">Failed to upload one or more attachments during sync</string>
+
+    <!-- Navigation & redesigned surfaces -->
+    <string name="nav_me">Me</string>
+    <string name="activity">Activity</string>
+    <string name="all_tags">All tags</string>
+    <string name="no_tags">No tags yet</string>
+    <string name="no_archived_memos">No archived memos</string>
+    <string name="no_resources">No resources yet</string>
+    <string name="pinned">Pinned</string>
+    <string name="archived_description">Review or restore archived memos</string>
+    <string name="settings_description">Accounts, sync, app lock, and preferences</string>
+    <string name="heatmap_less">Less</string>
+    <string name="heatmap_more">More</string>
 </resources>

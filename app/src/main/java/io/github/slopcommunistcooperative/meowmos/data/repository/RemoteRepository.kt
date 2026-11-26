@@ -12,6 +12,21 @@ import java.io.InputStream
 import java.time.Instant
 
 abstract class RemoteRepository {
+    internal abstract val accountKey: String
+
+    internal abstract suspend fun listComments(
+        parent: String,
+        pageSize: Int,
+        pageToken: String? = null,
+    ): ApiResponse<Pair<List<Memo>, String?>>
+
+    internal abstract suspend fun createComment(
+        parent: String,
+        content: String,
+        visibility: MemoVisibility,
+        space: String?,
+    ): ApiResponse<Memo>
+
     abstract suspend fun listMemos(): ApiResponse<List<Memo>>
     abstract suspend fun listArchivedMemos(): ApiResponse<List<Memo>>
     abstract suspend fun listWorkspaceMemos(pageSize: Int, pageToken: String?): ApiResponse<Pair<List<Memo>, String?>>

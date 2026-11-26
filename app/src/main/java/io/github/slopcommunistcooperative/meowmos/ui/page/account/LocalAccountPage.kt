@@ -33,6 +33,8 @@ import io.github.slopcommunistcooperative.meowmos.R
 import io.github.slopcommunistcooperative.meowmos.data.model.Account
 import io.github.slopcommunistcooperative.meowmos.data.model.displayTitle
 import io.github.slopcommunistcooperative.meowmos.ext.string
+import io.github.slopcommunistcooperative.meowmos.ui.component.meowmosCardBorder
+import io.github.slopcommunistcooperative.meowmos.ui.component.meowmosCardColors
 
 @Composable
 fun LocalAccountPage(
@@ -53,9 +55,12 @@ fun LocalAccountPage(
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(15.dp)
+                    .padding(16.dp),
+                shape = MaterialTheme.shapes.medium,
+                colors = meowmosCardColors(),
+                border = meowmosCardBorder(),
             ) {
-                Column(Modifier.padding(15.dp)) {
+                Column(Modifier.padding(16.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
                             imageVector = Icons.Outlined.Home,

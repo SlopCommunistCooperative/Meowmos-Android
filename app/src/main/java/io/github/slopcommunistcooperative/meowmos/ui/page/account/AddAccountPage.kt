@@ -15,6 +15,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -25,6 +26,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavHostController
@@ -35,6 +37,8 @@ import io.github.slopcommunistcooperative.meowmos.data.model.Account
 import io.github.slopcommunistcooperative.meowmos.ext.popBackStackIfLifecycleIsResumed
 import io.github.slopcommunistcooperative.meowmos.ext.string
 import io.github.slopcommunistcooperative.meowmos.ui.component.MemosIcon
+import io.github.slopcommunistcooperative.meowmos.ui.component.meowmosCardBorder
+import io.github.slopcommunistcooperative.meowmos.ui.component.meowmosCardColors
 import io.github.slopcommunistcooperative.meowmos.ui.page.common.RouteName
 import io.github.slopcommunistcooperative.meowmos.viewmodel.LocalUserState
 
@@ -61,6 +65,7 @@ fun AddAccountPage(
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
             LargeTopAppBar(
                 title = {
@@ -80,7 +85,11 @@ fun AddAccountPage(
                         }
                     }
                 },
-                scrollBehavior = scrollBehavior
+                scrollBehavior = scrollBehavior,
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+                ),
             )
         }
     ) { innerPadding ->
@@ -94,14 +103,16 @@ fun AddAccountPage(
             if (!hasLocalAccount) {
                 item {
                     Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                coroutineScope.launch {
-                                    userStateViewModel.addLocalAccount()
-                                        .suspendOnSuccess { toMemos() }
-                                }
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = MaterialTheme.shapes.medium,
+                        colors = meowmosCardColors(),
+                        border = meowmosCardBorder(),
+                        onClick = {
+                            coroutineScope.launch {
+                                userStateViewModel.addLocalAccount()
+                                    .suspendOnSuccess { toMemos() }
                             }
+                        },
                     ) {
                         ListItem(
                             headlineContent = { Text(R.string.add_local_account.string) },
@@ -112,7 +123,8 @@ fun AddAccountPage(
                                     contentDescription = null,
                                     tint = MaterialTheme.colorScheme.primary
                                 )
-                            }
+                            },
+                            colors = ListItemDefaults.colors(containerColor = Color.Transparent),
                         )
                     }
                 }
@@ -120,9 +132,11 @@ fun AddAccountPage(
 
             item {
                 Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { navController.navigate(RouteName.LOGIN) }
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = MaterialTheme.shapes.medium,
+                    colors = meowmosCardColors(),
+                    border = meowmosCardBorder(),
+                    onClick = { navController.navigate(RouteName.LOGIN) },
                 ) {
                     ListItem(
                         headlineContent = { Text(R.string.add_memos_account.string) },
@@ -133,7 +147,8 @@ fun AddAccountPage(
                                 contentDescription = null,
                                 tint = MaterialTheme.colorScheme.primary
                             )
-                        }
+                        },
+                        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
                     )
                 }
             }

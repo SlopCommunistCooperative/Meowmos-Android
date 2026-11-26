@@ -1,59 +1,90 @@
 package io.github.slopcommunistcooperative.meowmos.ui.page.memos
 
+import android.net.Uri
+import androidx.compose.foundation.layout.Row
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material3.DrawerState
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.outlined.Tag
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import io.github.slopcommunistcooperative.meowmos.ui.component.ActionIconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavHostController
-import kotlinx.coroutines.launch
 import io.github.slopcommunistcooperative.meowmos.R
-import io.github.slopcommunistcooperative.meowmos.ext.string
+import io.github.slopcommunistcooperative.meowmos.ext.popBackStackIfLifecycleIsResumed
+import io.github.slopcommunistcooperative.meowmos.ui.component.ActionIconButton
+import io.github.slopcommunistcooperative.meowmos.ui.component.WayfindingBadge
+import io.github.slopcommunistcooperative.meowmos.ui.component.WayfindingTone
 import io.github.slopcommunistcooperative.meowmos.ui.page.common.RouteName
 
 @Composable
 fun TagMemoPage(
-    drawerState: DrawerState? = null,
     tag: String,
-    navController: NavHostController
+    navController: NavHostController,
 ) {
     MemoBrowser { onMemoClick ->
-        TagMemoPageContent(drawerState, tag, navController, onMemoClick)
+        TagMemoPageContent(
+            tag = tag,
+            navController = navController,
+            onMemoClick = onMemoClick,
+        )
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TagMemoPageContent(
-    drawerState: DrawerState? = null,
     tag: String,
     navController: NavHostController,
     onMemoClick: (String) -> Unit,
 ) {
-    val scope = rememberCoroutineScope()
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val normalizedCurrentTag = remember(tag) { normalizeTag(tag) }
 
     Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
             TopAppBar(
-                title = { Text(tag) },
-                navigationIcon = {
-                    if (drawerState != null) {
-                        ActionIconButton(label = R.string.menu.string, onClick = { scope.launch { drawerState.open() } }) {
-                            Icon(Icons.Filled.Menu, contentDescription = R.string.menu.string)
-                        }
+                title = {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        WayfindingBadge(
+                            text = normalizedCurrentTag,
+                            icon = Icons.Outlined.Tag,
+                            tone = WayfindingTone.Signal,
+                        )
                     }
                 },
+                navigationIcon = {
+                    ActionIconButton(
+                        label = stringResource(R.string.back),
+                        onClick = {
+                            navController.popBackStackIfLifecycleIsResumed(lifecycleOwner)
+                        },
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.back),
+                        )
+                    }
+                },
+                scrollBehavior = scrollBehavior,
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+                ),
             )
         },
-
         content = { innerPadding ->
             MemosList(
                 onMemoClick = onMemoClick,
@@ -63,13 +94,13 @@ private fun TagMemoPageContent(
                     if (normalizeTag(clickedTag) == normalizedCurrentTag) {
                         return@MemosList
                     }
-                    navController.navigate("${RouteName.TAG}/${java.net.URLEncoder.encode(clickedTag, "UTF-8")}") {
+                    navController.navigate("${RouteName.TAG}/${Uri.encode(clickedTag)}") {
                         launchSingleTop = true
                         restoreState = true
                     }
-                }
+                },
             )
-        }
+        },
     )
 }
 

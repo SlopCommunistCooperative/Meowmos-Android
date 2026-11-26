@@ -5,8 +5,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Explore
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -27,6 +30,7 @@ import androidx.paging.compose.itemKey
 import io.github.slopcommunistcooperative.meowmos.R
 import io.github.slopcommunistcooperative.meowmos.data.model.Memo
 import io.github.slopcommunistcooperative.meowmos.ui.component.ExploreMemoCard
+import io.github.slopcommunistcooperative.meowmos.ui.component.MeowmosEmptyState
 import io.github.slopcommunistcooperative.meowmos.ui.util.edgeToEdgeContentPadding
 import io.github.slopcommunistcooperative.meowmos.viewmodel.ExploreViewModel
 
@@ -41,7 +45,7 @@ fun ExploreList(
 @Composable
 internal fun ExploreListContent(memos: LazyPagingItems<Memo>, contentPadding: PaddingValues) {
     LazyColumn(
-        modifier = Modifier.consumeWindowInsets(contentPadding),
+        modifier = Modifier.consumeWindowInsets(contentPadding).imePadding(),
         contentPadding = edgeToEdgeContentPadding(contentPadding),
     ) {
         if (memos.loadState.refresh is LoadState.Loading || memos.loadState.refresh is LoadState.Error) {
@@ -50,10 +54,9 @@ internal fun ExploreListContent(memos: LazyPagingItems<Memo>, contentPadding: Pa
             }
         } else if (memos.itemCount == 0) {
             item(key = "empty") {
-                Text(
-                    stringResource(R.string.no_memos),
-                    modifier = Modifier.padding(24.dp),
-                    style = MaterialTheme.typography.bodyLarge,
+                MeowmosEmptyState(
+                    icon = Icons.Outlined.Explore,
+                    title = stringResource(R.string.no_memos),
                 )
             }
         }

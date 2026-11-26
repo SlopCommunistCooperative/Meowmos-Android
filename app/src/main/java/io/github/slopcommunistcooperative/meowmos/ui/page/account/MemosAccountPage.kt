@@ -33,6 +33,8 @@ import io.github.slopcommunistcooperative.meowmos.data.model.MemosAccount
 import io.github.slopcommunistcooperative.meowmos.data.model.displayTitle
 import io.github.slopcommunistcooperative.meowmos.ext.string
 import io.github.slopcommunistcooperative.meowmos.ui.component.MemosIcon
+import io.github.slopcommunistcooperative.meowmos.ui.component.meowmosCardBorder
+import io.github.slopcommunistcooperative.meowmos.ui.component.meowmosCardColors
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.OkHttpClient
 
@@ -66,9 +68,12 @@ fun MemosAccountPage(
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(15.dp)
+                    .padding(16.dp),
+                shape = MaterialTheme.shapes.medium,
+                colors = meowmosCardColors(),
+                border = meowmosCardBorder(),
             ) {
-                Column(Modifier.padding(15.dp)) {
+                Column(Modifier.padding(16.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         if (accountAvatarUrl.isNullOrBlank()) {
                             Icon(

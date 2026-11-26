@@ -5,6 +5,7 @@ import android.content.ClipboardManager
 import android.content.Intent
 import android.text.format.DateUtils
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
@@ -67,14 +69,15 @@ fun MemosCard(
     editGesture: MemoEditGesture = MemoEditGesture.NONE,
     previewMode: Boolean = false,
     showSyncStatus: Boolean = false,
-    onTagClick: ((String) -> Unit)? = null
+    onTagClick: ((String) -> Unit)? = null,
+    footer: @Composable () -> Unit = {},
 ) {
     val memosViewModel = LocalMemos.current
     val rootNavController = LocalRootNavController.current
     val scope = rememberCoroutineScope()
 
     val cardModifier = Modifier
-        .padding(horizontal = 15.dp, vertical = 10.dp)
+        .padding(horizontal = 16.dp, vertical = 6.dp)
         .fillMaxWidth()
         .combinedClickable(
             onClick = {
@@ -100,20 +103,21 @@ fun MemosCard(
             }
         )
 
+    val spaceLabel = memosViewModel.spaceTitle(memo.space)
+
     Card(
         modifier = cardModifier,
-        border = if (memo.pinned) {
-            BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
-        } else {
-            null
-        }
+        shape = MaterialTheme.shapes.medium,
+        colors = meowmosCardColors(),
+        border = meowmosCardBorder(pinned = memo.pinned),
     ) {
         Column {
             Row(
                 modifier = Modifier
-                    .padding(start = 15.dp)
+                    .padding(start = 16.dp, end = 4.dp, top = 4.dp)
                     .fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
             ) {
                 Text(
                     DateUtils.getRelativeTimeSpanString(
@@ -122,32 +126,41 @@ fun MemosCard(
                         DateUtils.SECOND_IN_MILLIS
                     ).toString(),
                     style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.outline
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
+                if (memo.pinned) {
+                    WayfindingBadge(
+                        text = stringResource(R.string.pinned),
+                        icon = Icons.Outlined.PushPin,
+                        tone = WayfindingTone.Signal,
+                    )
+                }
+                if (spaceLabel != null) {
+                    WayfindingBadge(
+                        text = spaceLabel,
+                        tone = WayfindingTone.Beacon,
+                        modifier = Modifier.widthIn(max = 140.dp),
+                    )
+                }
                 if (showSyncStatus && memo.needsSync) {
                     Icon(
                         imageVector = Icons.Outlined.CloudOff,
                         contentDescription = R.string.memo_sync_pending.string,
-                        modifier = Modifier
-                            .padding(start = 5.dp)
-                            .size(20.dp),
-                        tint = MaterialTheme.colorScheme.error
+                        modifier = Modifier.size(18.dp),
+                        tint = MaterialTheme.colorScheme.error,
                     )
                 }
                 if (LocalUserState.current.currentUser?.defaultVisibility != memo.visibility) {
                     Icon(
                         memo.visibility.icon,
                         contentDescription = stringResource(memo.visibility.titleResource),
-                        modifier = Modifier
-                            .padding(start = 5.dp)
-                            .size(20.dp),
-                        tint = MaterialTheme.colorScheme.outline
+                        modifier = Modifier.size(18.dp),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
                 Spacer(modifier = Modifier.weight(1f))
                 MemosCardActionButton(memo)
             }
-
             MemoContent(
                 memo,
                 previewMode = previewMode,
@@ -172,6 +185,7 @@ fun MemosCard(
                 },
                 onTagClick = onTagClick
             )
+            footer()
         }
     }
 }

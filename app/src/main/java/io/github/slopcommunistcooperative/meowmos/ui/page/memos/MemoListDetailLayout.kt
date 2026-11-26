@@ -3,6 +3,9 @@ package io.github.slopcommunistcooperative.meowmos.ui.page.memos
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.StickyNote2
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
@@ -25,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 import io.github.slopcommunistcooperative.meowmos.R
+import io.github.slopcommunistcooperative.meowmos.ui.component.MeowmosEmptyState
 import io.github.slopcommunistcooperative.meowmos.viewmodel.LocalUserState
 
 @Composable
@@ -77,9 +81,15 @@ internal fun MemoListDetailLayout(
             detailPane = {
                 AnimatedPane {
                     if (selectedMemo == null) {
-                        Surface(Modifier.fillMaxSize()) {
+                        Surface(
+                            modifier = Modifier.fillMaxSize(),
+                            color = MaterialTheme.colorScheme.surfaceContainerLow,
+                        ) {
                             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                                Text(stringResource(R.string.select_memo))
+                                MeowmosEmptyState(
+                                    icon = Icons.AutoMirrored.Outlined.StickyNote2,
+                                    title = stringResource(R.string.select_memo),
+                                )
                             }
                         }
                     } else {

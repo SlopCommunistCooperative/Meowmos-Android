@@ -3,7 +3,7 @@
     <string name="app_name">Meowmos</string>
     <string name="search">搜索</string>
     <string name="back">返回</string>
-    <string name="memos">灵感</string>
+    <string name="memos">笔记</string>
     <string name="menu">菜单</string>
     <string name="new_memo">新 MEMO</string>
     <string name="compose">撰写</string>
@@ -68,7 +68,7 @@
     <string name="memo_visibility_public">访客可见</string>
     <string name="memo_visibility_protected">本地用户可见</string>
     <string name="memo_visibility_private">仅自己可见</string>
-    <string name="explore">发现</string>
+    <string name="explore">探索</string>
     <string name="view_more">查看更多</string>
     <string name="accounts">账户</string>
     <string name="preferences">偏好设置</string>
@@ -168,6 +168,15 @@
 
     <!-- 可见性与搜索 -->
     <string name="memo_visibility_space">空间成员可见</string>
+    <string name="memo_comments">评论</string>
+    <string name="memo_comment_reply">回复</string>
+    <string name="memo_comment_write">写评论</string>
+    <string name="memo_comment_post">发布评论</string>
+    <string name="memo_comment_visibility">谁可以看见这条评论？%1$s</string>
+    <string name="memo_comment_view_all">查看全部评论</string>
+    <string name="memo_comment_load_failed">无法加载评论。</string>
+    <string name="memo_comment_post_failed">无法发布评论，请重试。</string>
+    <string name="memo_comment_hide">收起评论</string>
     <string name="memo_no_space">不归入空间</string>
     <string name="memo_select_space">选择发布空间</string>
     <string name="memo_space_unavailable">上次选择的空间已不可用。这条笔记仅自己可见。</string>
@@ -204,4 +213,17 @@
     <string name="sync_resource_failed">同步资源失败</string>
     <string name="sync_delete_resource_failed">删除服务器上的资源失败</string>
     <string name="attachment_upload_failed">同步期间一个或多个附件上传失败</string>
+
+    <!-- 导航与页面文案 -->
+    <string name="nav_me">我</string>
+    <string name="activity">活跃度</string>
+    <string name="all_tags">全部标签</string>
+    <string name="no_tags">暂无标签</string>
+    <string name="no_archived_memos">暂无归档笔记</string>
+    <string name="no_resources">暂无资源文件</string>
+    <string name="pinned">置顶</string>
+    <string name="archived_description">查看或恢复已归档的笔记</string>
+    <string name="settings_description">账户、同步、应用锁与偏好设置</string>
+    <string name="heatmap_less">少</string>
+    <string name="heatmap_more">多</string>
 </resources>

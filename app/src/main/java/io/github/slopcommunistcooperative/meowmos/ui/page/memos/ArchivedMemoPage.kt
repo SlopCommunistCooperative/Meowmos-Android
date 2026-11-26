@@ -1,45 +1,67 @@
 package io.github.slopcommunistcooperative.meowmos.ui.page.memos
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material3.DrawerState
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
-import kotlinx.coroutines.launch
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.navigation.NavHostController
 import io.github.slopcommunistcooperative.meowmos.R
-import io.github.slopcommunistcooperative.meowmos.ext.string
+import io.github.slopcommunistcooperative.meowmos.ext.popBackStackIfLifecycleIsResumed
+import io.github.slopcommunistcooperative.meowmos.ui.component.ActionIconButton
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ArchivedMemoPage(
-    drawerState: DrawerState? = null
+    navController: NavHostController,
 ) {
-    val scope = rememberCoroutineScope()
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
     Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
             TopAppBar(
-                title = { Text(text = R.string.archived.string) },
+                title = {
+                    Text(
+                        text = stringResource(R.string.archived),
+                        style = MaterialTheme.typography.titleLarge,
+                    )
+                },
                 navigationIcon = {
-                    if (drawerState != null) {
-                        IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                            Icon(Icons.Filled.Menu, contentDescription = R.string.menu.string)
-                        }
+                    ActionIconButton(
+                        label = stringResource(R.string.back),
+                        onClick = {
+                            navController.popBackStackIfLifecycleIsResumed(lifecycleOwner)
+                        },
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.back),
+                        )
                     }
-                }
+                },
+                scrollBehavior = scrollBehavior,
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+                ),
             )
         },
-
         content = { innerPadding ->
             ArchivedMemoList(
-                contentPadding = innerPadding
+                contentPadding = innerPadding,
             )
-        }
+        },
     )
 }

@@ -6,10 +6,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.StickyNote2
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -21,6 +25,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -39,6 +44,8 @@ import io.github.slopcommunistcooperative.meowmos.data.model.Settings
 import io.github.slopcommunistcooperative.meowmos.ext.settingsDataStore
 import io.github.slopcommunistcooperative.meowmos.ext.string
 import io.github.slopcommunistcooperative.meowmos.ui.component.ArchivedMemoCard
+import io.github.slopcommunistcooperative.meowmos.ui.component.MeowmosEmptyState
+import io.github.slopcommunistcooperative.meowmos.ui.component.WayfindingSectionHeader
 import io.github.slopcommunistcooperative.meowmos.ui.component.MemosCard
 import io.github.slopcommunistcooperative.meowmos.ui.page.common.LocalRootNavController
 import io.github.slopcommunistcooperative.meowmos.ui.util.edgeToEdgeContentPadding
@@ -62,6 +69,8 @@ fun MemosList(
     onTagClick: ((String) -> Unit)? = null,
     onMemoClick: ((String) -> Unit)? = null,
     archivedResults: List<MemoEntity> = emptyList(),
+    showComments: Boolean = false,
+    headerContent: (LazyListScope.() -> Unit)? = null,
 ) {
     val context = LocalContext.current
     val navController = LocalRootNavController.current
@@ -76,6 +85,7 @@ fun MemosList(
     val refreshState = rememberPullToRefreshState()
     val scope = rememberCoroutineScope()
     var isRefreshing by remember { mutableStateOf(false) }
+    var commentRefresh by remember { mutableIntStateOf(0) }
     var syncAlert by remember { mutableStateOf<PullRefreshSyncAlert?>(null) }
     val filteredMemos = remember(viewModel.memos.toList(), tag, searchString) {
         val pinned = viewModel.memos.filter { it.pinned }
@@ -127,11 +137,12 @@ fun MemosList(
                         }
                     }
                 }
+                if (showComments) commentRefresh++
                 isRefreshing = false
             }
         },
         state = refreshState,
-        modifier = Modifier.fillMaxSize()
+        modifier = if (showComments) Modifier.fillMaxSize().imePadding() else Modifier.fillMaxSize()
     ) {
         LazyColumn(
             modifier = Modifier
@@ -140,34 +151,41 @@ fun MemosList(
             state = lazyListState,
             contentPadding = listContentPadding
         ) {
+            headerContent?.invoke(this)
             if (filteredMemos.isEmpty() && archivedResults.isEmpty()) {
                 item(key = "empty") {
-                    Text(stringResource(R.string.no_memos), modifier = Modifier.padding(24.dp))
+                    MeowmosEmptyState(
+                        icon = Icons.AutoMirrored.Outlined.StickyNote2,
+                        title = stringResource(R.string.no_memos),
+                    )
                 }
             }
             items(filteredMemos, key = { it.identifier }) { memo ->
+                val openMemo = {
+                    if (onMemoClick != null) {
+                        onMemoClick(memo.identifier)
+                    } else navController.navigate(
+                        "${RouteName.MEMO_DETAIL}?memoId=${Uri.encode(memo.identifier)}"
+                    )
+                }
                 MemosCard(
                     memo = memo,
-                    onClick = { selectedMemo ->
-                        if (onMemoClick != null) {
-                            onMemoClick(selectedMemo.identifier)
-                        } else navController.navigate(
-                            "${RouteName.MEMO_DETAIL}?memoId=${Uri.encode(selectedMemo.identifier)}"
-                        )
-                    },
+                    onClick = { openMemo() },
                     editGesture = editGesture ?: MemoEditGesture.NONE,
                     previewMode = true,
                     showSyncStatus = currentAccount !is Account.Local,
-                    onTagClick = onTagClick
+                    onTagClick = onTagClick,
+                    footer = {
+                        if (showComments) MemoComments(
+                            memo, memo.accountKey, memo.space, onViewAll = openMemo, refresh = commentRefresh,
+                        )
+                    },
                 )
             }
             if (archivedResults.isNotEmpty()) {
                 item(key = "archived-header") {
-                    Text(
-                        stringResource(R.string.archived),
-                        modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp),
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.outline,
+                    WayfindingSectionHeader(
+                        title = stringResource(R.string.archived),
                     )
                 }
                 items(archivedResults, key = { "archived-${it.identifier}" }) { memo ->

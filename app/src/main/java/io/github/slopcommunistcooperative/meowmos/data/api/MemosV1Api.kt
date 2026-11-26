@@ -3,8 +3,10 @@ package io.github.slopcommunistcooperative.meowmos.data.api
 import android.net.Uri
 import androidx.core.net.toUri
 import com.skydoves.sandwich.ApiResponse
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonNames
 import io.github.slopcommunistcooperative.meowmos.data.model.MemoLocation
 import io.github.slopcommunistcooperative.meowmos.data.model.MemoSpace
 import okhttp3.RequestBody
@@ -37,6 +39,19 @@ interface MemosV1Api {
 
     @POST("api/v1/memos")
     suspend fun createMemo(@Body body: MemosV1CreateMemoRequest): ApiResponse<MemosV1Memo>
+
+    @GET("api/v1/memos/{id}/comments")
+    suspend fun listComments(
+        @Path("id") memoId: String,
+        @Query("pageSize") pageSize: Int,
+        @Query("pageToken") pageToken: String?,
+    ): ApiResponse<ListMemosResponse>
+
+    @POST("api/v1/memos/{id}/comments")
+    suspend fun createComment(
+        @Path("id") memoId: String,
+        @Body body: MemosV1CreateMemoRequest,
+    ): ApiResponse<MemosV1Memo>
 
     @PATCH("api/v1/memos/{id}")
     suspend fun updateMemo(@Path("id") memoId: String, @Body body: UpdateMemoRequest, @Query("updateMask") updateMask: String? = null): ApiResponse<MemosV1Memo>
@@ -93,12 +108,15 @@ data class MemosV1CreateMemoRequest(
     val createTime: Instant? = null,
     val location: MemoLocation? = null,
     val space: String? = null,
+    val parent: String? = null,
 )
 
+@OptIn(ExperimentalSerializationApi::class)
 @Serializable
 data class ListMemosResponse(
-    val memos: List<MemosV1Memo>,
-    val nextPageToken: String?
+    @JsonNames("comments") // Calendar versions before 26.11.2 used this key on the comments endpoint.
+    val memos: List<MemosV1Memo> = emptyList(),
+    val nextPageToken: String? = null,
 )
 
 @Serializable

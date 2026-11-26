@@ -5,12 +5,14 @@ import android.net.Uri
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.skydoves.sandwich.ApiResponse
+import com.skydoves.sandwich.getOrNull
 import com.skydoves.sandwich.suspendOnSuccess
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -31,13 +33,21 @@ import io.github.slopcommunistcooperative.meowmos.data.constant.MeowmosException
 import io.github.slopcommunistcooperative.meowmos.data.local.entity.MemoEntity
 import io.github.slopcommunistcooperative.meowmos.data.local.entity.ResourceEntity
 import io.github.slopcommunistcooperative.meowmos.data.model.DailyUsageStat
+import io.github.slopcommunistcooperative.meowmos.data.model.Memo
 import io.github.slopcommunistcooperative.meowmos.data.model.MemoVisibility
 import io.github.slopcommunistcooperative.meowmos.data.model.SyncStatus
+import io.github.slopcommunistcooperative.meowmos.data.model.UserSettings
+import io.github.slopcommunistcooperative.meowmos.data.repository.MemosV1Repository
+import io.github.slopcommunistcooperative.meowmos.data.repository.RemoteRepository
 import io.github.slopcommunistcooperative.meowmos.data.service.AccountService
 import io.github.slopcommunistcooperative.meowmos.data.service.MemoService
 import io.github.slopcommunistcooperative.meowmos.ext.getErrorMessage
+import io.github.slopcommunistcooperative.meowmos.ext.settingsDataStore
 import io.github.slopcommunistcooperative.meowmos.ext.string
+import io.github.slopcommunistcooperative.meowmos.ext.updateUserSettings
 import io.github.slopcommunistcooperative.meowmos.widget.WidgetUpdater
+import timber.log.Timber
+import java.io.IOException
 import java.time.LocalDate
 import java.time.OffsetDateTime
 import javax.inject.Inject
@@ -68,6 +78,56 @@ class MemosViewModel @Inject constructor(
         memoService.syncStatus.stateIn(viewModelScope, SharingStarted.Eagerly, SyncStatus())
 
     private val initialLoad = MutableStateFlow(false)
+    private val commentRevisions = mutableStateMapOf<Pair<String, String>, Int>()
+    private val spaceTitles = mutableStateMapOf<String, String>()
+
+    fun spaceTitle(spaceName: String?): String? =
+        spaceName?.takeIf { it.isNotBlank() }?.let { spaceTitles[it] }
+
+    internal fun commentRevision(accountKey: String, parent: String): Int =
+        commentRevisions[accountKey to parent] ?: 0
+
+    internal fun commentSettings(accountKey: String) = appContext.settingsDataStore.data
+        .map { settings -> settings.usersList.firstOrNull { it.accountKey == accountKey }?.settings ?: UserSettings() }
+        .distinctUntilChanged()
+
+    internal fun rememberCommentVisibility(accountKey: String, visibility: MemoVisibility) {
+        viewModelScope.launch {
+            try {
+                appContext.updateUserSettings(accountKey) { it.copy(lastCommentVisibility = visibility) }
+            } catch (error: IOException) {
+                Timber.w(error, "Could not remember comment visibility")
+            }
+        }
+    }
+
+    internal suspend fun listMemoComments(
+        accountKey: String,
+        parent: String,
+        pageSize: Int,
+        pageToken: String?,
+    ): ApiResponse<Pair<List<Memo>, String?>> {
+        val repository = commentRepository(accountKey)
+            ?: return ApiResponse.Failure.Exception(MeowmosException.notLogin)
+        return repository.listComments(parent, pageSize, pageToken)
+    }
+
+    internal suspend fun postMemoComment(
+        accountKey: String,
+        parent: String,
+        content: String,
+        visibility: MemoVisibility,
+        space: String?,
+    ): ApiResponse<Memo> = withContext(viewModelScope.coroutineContext) {
+        val repository = commentRepository(accountKey)
+            ?: return@withContext ApiResponse.Failure.Exception(MeowmosException.notLogin)
+        repository.createComment(parent, content, visibility, space).suspendOnSuccess {
+            commentRevisions[accountKey to parent] = commentRevision(accountKey, parent) + 1
+        }
+    }
+
+    private suspend fun commentRepository(accountKey: String): RemoteRepository? =
+        accountService.getRemoteRepository()?.takeIf { it.accountKey == accountKey }
 
     init {
         snapshotFlow { memos.toList() }
@@ -90,6 +150,22 @@ class MemosViewModel @Inject constructor(
                     }
                     memoService.memos.collectLatest { latestMemos ->
                         applyMemos(latestMemos)
+                    }
+                }
+        }
+
+        viewModelScope.launch {
+            accountService.currentAccount
+                .map { it?.accountKey() }
+                .distinctUntilChanged()
+                .collectLatest {
+                    spaceTitles.clear()
+                    val repository = accountService.getRemoteRepository() as? MemosV1Repository ?: return@collectLatest
+                    val spaces = repository.listSpaces().getOrNull().orEmpty()
+                    spaces.forEach { space ->
+                        if (space.title.isNotBlank()) {
+                            spaceTitles[space.name] = space.title
+                        }
                     }
                 }
         }

@@ -19,6 +19,7 @@ Download the APK from [Meowmos releases](https://github.com/SlopCommunistCoopera
 - Back up and restore local notes.
 - Write offline and sync when you're back online.
 - On servers that support Spaces, use the menu next to Post to choose a space you belong to. Meowmos remembers that choice for new notes on the same account. Until you choose a space, new notes have no space. Selecting a space defaults the note's visibility to its members.
+- On supported Memos servers, read comments below a note, or preview them and reply directly from Home and Explore. Posting requires a connection. The editor starts with the note's audience or a compatible audience you last selected on that account.
 - Use Material You themes and a themed app icon.
 - Write and preview Markdown, add images and files, and check off tasks.
 - Find notes with search and tags. Pin notes you want to keep at the top.

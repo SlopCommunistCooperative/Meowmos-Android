@@ -30,6 +30,7 @@ import io.github.slopcommunistcooperative.meowmos.data.repository.MemosV1Reposit
 import io.github.slopcommunistcooperative.meowmos.data.service.AccountService
 import io.github.slopcommunistcooperative.meowmos.data.service.MemoService
 import io.github.slopcommunistcooperative.meowmos.ext.settingsDataStore
+import io.github.slopcommunistcooperative.meowmos.ext.updateUserSettings
 import io.github.slopcommunistcooperative.meowmos.widget.WidgetUpdater
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import java.util.UUID
@@ -141,16 +142,7 @@ class MemoInputViewModel @Inject constructor(
 
     private fun updateUserSettings(accountKey: String? = null, transform: (UserSettings) -> UserSettings) {
         viewModelScope.launch {
-            context.settingsDataStore.updateData { settings ->
-                val index = settings.usersList.indexOfFirst { it.accountKey == (accountKey ?: settings.currentUser) }
-                if (index == -1) {
-                    return@updateData settings
-                }
-                val users = settings.usersList.toMutableList()
-                val user = users[index]
-                users[index] = user.copy(settings = transform(user.settings))
-                settings.copy(usersList = users)
-            }
+            context.updateUserSettings(accountKey, transform)
         }
     }
 

@@ -9,6 +9,8 @@ import io.github.slopcommunistcooperative.meowmos.data.model.User
 import okhttp3.MultipartBody
 import retrofit2.http.Body
 import retrofit2.http.DELETE
+import retrofit2.http.Field
+import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
 import retrofit2.http.Multipart
 import retrofit2.http.PATCH
@@ -60,6 +62,23 @@ interface MemosV0Api {
 
     @POST("api/v1/memo")
     suspend fun createMemo(@Body body: MemosV0CreateMemoInput): ApiResponse<MemosV0Memo>
+
+    @GET("api/v2/memos/{id}")
+    suspend fun getCommentParent(@Path("id") memoId: Long): ApiResponse<MemosV0CommentResponse>
+
+    @GET("api/v2/memos/{id}/comments")
+    suspend fun listComments(@Path("id") memoId: Long): ApiResponse<MemosV0CommentsResponse>
+
+    @FormUrlEncoded
+    @POST("api/v2/memos/{id}/comments")
+    suspend fun createComment(
+        @Path("id") memoId: Long,
+        @Field("comment.content") content: String,
+        @Field("comment.visibility") visibility: String,
+    ): ApiResponse<MemosV0CommentResponse>
+
+    @GET("api/v2/users/{id}")
+    suspend fun getCommentUser(@Path("id") userId: Long): ApiResponse<MemosV0CommentUserResponse>
 
     @GET("api/v1/tag")
     suspend fun getTags(@Query("creatorId") creatorId: Long? = null): ApiResponse<List<String>>
@@ -164,8 +183,50 @@ data class MemosV0Memo(
     val rowStatus: MemosRowStatus = MemosRowStatus.NORMAL,
     val updatedTs: Long,
     val visibility: MemosVisibility = MemosVisibility.PRIVATE,
-    val resourceList: List<MemosV0Resource>? = null
+    val resourceList: List<MemosV0Resource>? = null,
+    val relationList: List<MemosV0Relation>? = null,
 )
+
+@Serializable
+data class MemosV0Relation(val memoId: Long, val type: String)
+
+@Serializable
+data class MemosV0CommentResponse(val memo: MemosV0CommentMemo)
+
+@Serializable
+data class MemosV0CommentsResponse(val memos: List<MemosV0CommentMemo> = emptyList())
+
+@Serializable
+data class MemosV0CommentMemo(
+    val name: String,
+    val content: String = "",
+    val creator: String = "",
+    val visibility: MemosVisibility = MemosVisibility.PRIVATE,
+    val rowStatus: MemosRowStatus = MemosRowStatus.NORMAL,
+    @Serializable(with = Rfc3339InstantSerializer::class)
+    val createTime: Instant? = null,
+    val resources: List<MemosV0CommentResource> = emptyList(),
+)
+
+@Serializable
+data class MemosV0CommentResource(
+    val name: String,
+    val uid: String? = null,
+    val filename: String = "",
+    val externalLink: String? = null,
+    val type: String? = null,
+    @Serializable(with = Rfc3339InstantSerializer::class)
+    val createTime: Instant? = null,
+) {
+    fun uri(host: String): Uri =
+        v0ResourceUri(host, name.substringAfterLast('/'), filename, externalLink, uid)
+}
+
+@Serializable
+data class MemosV0CommentUserResponse(val user: MemosV0CommentUser)
+
+@Serializable
+data class MemosV0CommentUser(val username: String, val nickname: String? = null)
 
 @Serializable
 data class MemosV0Resource(
@@ -181,29 +242,17 @@ data class MemosV0Resource(
     var name: String?,
     var uid: String?
 ) {
-    fun uri(host: String): Uri {
-        if (!externalLink.isNullOrEmpty()) {
-            return externalLink.toUri()
-        }
-        if (!uid.isNullOrEmpty()) {
-            return host.toUri()
-                .buildUpon().appendPath("o").appendPath("r")
-                .appendPath(uid.toString()).build()
-        }
-        if (!name.isNullOrEmpty()) {
-            return host.toUri()
-                .buildUpon().appendPath("o").appendPath("r")
-                .appendPath(name.toString()).build()
-        }
-        if (!publicId.isNullOrEmpty()) {
-            return host.toUri()
-                .buildUpon().appendPath("o").appendPath("r")
-                .appendPath(id.toString()).appendPath(publicId).build()
-        }
-        return host.toUri()
-            .buildUpon().appendPath("o").appendPath("r")
-            .appendPath(id.toString()).appendPath(filename).build()
-    }
+    fun uri(host: String): Uri = v0ResourceUri(
+        host, id.toString(), publicId?.takeIf { it.isNotEmpty() } ?: filename,
+        externalLink, uid?.takeIf { it.isNotEmpty() } ?: name,
+    )
+}
+
+private fun v0ResourceUri(host: String, id: String, filename: String, externalLink: String?, uid: String?): Uri {
+    if (!externalLink.isNullOrEmpty()) return externalLink.toUri()
+    val path = host.toUri().buildUpon().appendPath("o").appendPath("r")
+    return if (!uid.isNullOrEmpty()) path.appendPath(uid).build()
+    else path.appendPath(id).appendPath(filename).build()
 }
 
 @Serializable

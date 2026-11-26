@@ -1,79 +1,76 @@
 package io.github.slopcommunistcooperative.meowmos.ui.page.memos
 
-import android.net.Uri
-import androidx.compose.material3.DrawerState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import io.github.slopcommunistcooperative.meowmos.data.model.Account
+import io.github.slopcommunistcooperative.meowmos.ui.page.common.LocalRootNavController
 import io.github.slopcommunistcooperative.meowmos.ui.page.common.RouteName
-import io.github.slopcommunistcooperative.meowmos.ui.page.common.MemosNavHost
+import io.github.slopcommunistcooperative.meowmos.ui.page.resource.ResourceListPage
 import io.github.slopcommunistcooperative.meowmos.viewmodel.LocalUserState
 
 @Composable
 fun MemosNavigation(
-    drawerState: DrawerState? = null,
-    navController: NavHostController
+    navController: NavHostController,
+    showHomeComposeFab: Boolean = true,
 ) {
+    val rootNavController = LocalRootNavController.current
     val userStateViewModel = LocalUserState.current
     val currentAccount by userStateViewModel.currentAccount.collectAsStateWithLifecycle()
     val hasExplore = currentAccount !is Account.Local
 
-    MemosNavHost(
+    // Top-level bottom-bar / rail destinations use Material 3 fade-through motion rather than
+    // lateral push transitions.
+    NavHost(
         navController = navController,
-        startDestination = RouteName.MEMOS
+        startDestination = RouteName.MEMOS,
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.surface),
+        enterTransition = { fadeIn(animationSpec = tween(180)) },
+        exitTransition = { fadeOut(animationSpec = tween(140)) },
+        popEnterTransition = { fadeIn(animationSpec = tween(180)) },
+        popExitTransition = { fadeOut(animationSpec = tween(140)) },
     ) {
-        composable(
-            RouteName.MEMOS,
-        ) {
+        composable(RouteName.MEMOS) {
             MemosHomePage(
-                drawerState = drawerState,
-                navController = navController,
+                showComposeFab = showHomeComposeFab,
             )
         }
 
-        composable(
-            RouteName.ARCHIVED
-        ) {
-            ArchivedMemoPage(
-                drawerState = drawerState
-            )
-        }
-
-        composable(
-            "${RouteName.TAG}/{tag}"
-        ) { entry ->
-            TagMemoPage(
-                drawerState = drawerState,
-                tag = entry.arguments?.getString("tag")?.let(Uri::decode) ?: "",
-                navController = navController
-            )
-        }
-
-        composable(
-            RouteName.EXPLORE
-        ) {
+        composable(RouteName.EXPLORE) {
             if (hasExplore) {
-                ExplorePage(
-                    drawerState = drawerState
-                )
+                ExplorePage()
             } else {
                 LaunchedEffect(Unit) {
                     navController.navigate(RouteName.MEMOS) {
-                        popUpTo(RouteName.EXPLORE) {
-                            inclusive = true
-                        }
+                        popUpTo(RouteName.EXPLORE) { inclusive = true }
                         launchSingleTop = true
                     }
                 }
             }
         }
 
-        composable(RouteName.SEARCH) {
-            SearchPage(navController = navController)
+        composable(RouteName.RESOURCE) {
+            ResourceListPage(
+                navController = rootNavController,
+                showBackButton = false,
+            )
+        }
+
+        composable(RouteName.ME) {
+            MePage()
         }
     }
 }

@@ -68,6 +68,7 @@ import io.github.slopcommunistcooperative.meowmos.ext.suspendOnErrorMessage
 import io.github.slopcommunistcooperative.meowmos.ui.component.Markdown
 import io.github.slopcommunistcooperative.meowmos.ui.util.rememberLocalNetworkPermissionRequest
 import io.github.slopcommunistcooperative.meowmos.ui.page.common.RouteName
+import io.github.slopcommunistcooperative.meowmos.ui.theme.MeowmosTheme
 import io.github.slopcommunistcooperative.meowmos.viewmodel.LocalUserState
 import io.github.slopcommunistcooperative.meowmos.viewmodel.LoginCompatibility
 
@@ -182,6 +183,7 @@ fun LoginPage(
         modifier = Modifier
             .imePadding()
             .nestedScroll(scrollBehavior.nestedScrollConnection),
+        containerColor = MaterialTheme.colorScheme.surface,
         snackbarHost = {
             SnackbarHost(hostState = snackbarState)
         },
@@ -200,16 +202,22 @@ fun LoginPage(
                         }
                     }
                 },
-                scrollBehavior = scrollBehavior
+                scrollBehavior = scrollBehavior,
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+                ),
             )
         },
         bottomBar = {
             BottomAppBar(
+                containerColor = MaterialTheme.colorScheme.surfaceContainer,
                 actions = {},
                 floatingActionButton = {
                     ExtendedFloatingActionButton(
                         onClick = { login() },
-                        containerColor = BottomAppBarDefaults.bottomAppBarFabColor,
+                        containerColor = MeowmosTheme.colors.wayfindingContainer,
+                        contentColor = MeowmosTheme.colors.onWayfindingContainer,
                         elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation(),
                         text = { Text(R.string.add_account.string) },
                         icon = {

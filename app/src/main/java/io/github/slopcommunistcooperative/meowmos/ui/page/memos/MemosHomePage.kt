@@ -1,61 +1,67 @@
 package io.github.slopcommunistcooperative.meowmos.ui.page.memos
 
+import android.net.Uri
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
-import io.github.slopcommunistcooperative.meowmos.ui.component.ActionIconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.navigation.NavHostController
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.launch
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.slopcommunistcooperative.meowmos.R
 import io.github.slopcommunistcooperative.meowmos.data.model.Account
 import io.github.slopcommunistcooperative.meowmos.ext.string
+import io.github.slopcommunistcooperative.meowmos.ui.component.ActionIconButton
 import io.github.slopcommunistcooperative.meowmos.ui.component.SyncStatusBadge
 import io.github.slopcommunistcooperative.meowmos.ui.page.common.LocalRootNavController
 import io.github.slopcommunistcooperative.meowmos.ui.page.common.RouteName
+import io.github.slopcommunistcooperative.meowmos.ui.theme.MeowmosTheme
 import io.github.slopcommunistcooperative.meowmos.viewmodel.LocalMemos
 import io.github.slopcommunistcooperative.meowmos.viewmodel.LocalUserState
 import io.github.slopcommunistcooperative.meowmos.viewmodel.ManualSyncResult
-import java.net.URLEncoder
+import kotlinx.coroutines.launch
 
 @Composable
 fun MemosHomePage(
-    drawerState: DrawerState? = null,
-    navController: NavHostController
+    showComposeFab: Boolean = true,
 ) {
     MemoBrowser { onMemoClick ->
-        MemosHomePageContent(drawerState, navController, onMemoClick)
+        MemosHomePageContent(
+            showComposeFab = showComposeFab,
+            onMemoClick = onMemoClick,
+        )
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun MemosHomePageContent(
-    drawerState: DrawerState? = null,
-    navController: NavHostController,
+    showComposeFab: Boolean,
     onMemoClick: (String) -> Unit,
 ) {
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val rootNavController = LocalRootNavController.current
     val memosViewModel = LocalMemos.current
     val userStateViewModel = LocalUserState.current
@@ -84,17 +90,16 @@ private fun MemosHomePageContent(
         }
     }
 
-
     Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
             TopAppBar(
-                title = { Text(text = R.string.memos.string) },
-                navigationIcon = {
-                    if (drawerState != null) {
-                        ActionIconButton(label = R.string.menu.string, onClick = { scope.launch { drawerState.open() } }) {
-                            Icon(Icons.Filled.Menu, contentDescription = R.string.menu.string)
-                        }
-                    }
+                title = {
+                    Text(
+                        text = stringResource(R.string.memos),
+                        style = MaterialTheme.typography.titleLarge,
+                    )
                 },
                 actions = {
                     if (currentAccount !is Account.Local) {
@@ -105,44 +110,68 @@ private fun MemosHomePageContent(
                                 scope.launch {
                                     requestManualSync()
                                 }
-                            }
+                            },
                         )
                     }
-                    ActionIconButton(label = R.string.search.string, onClick = {
-                        navController.navigate(RouteName.SEARCH)
-                    }) {
-                        Icon(Icons.Filled.Search, contentDescription = R.string.search.string)
+                    ActionIconButton(
+                        label = stringResource(R.string.search),
+                        onClick = {
+                            rootNavController.navigate(RouteName.SEARCH)
+                        },
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Search,
+                            contentDescription = stringResource(R.string.search),
+                        )
                     }
-                }
-            )
-        },
-
-        floatingActionButton = {
-            ExtendedFloatingActionButton(
-                onClick = {
-                    rootNavController.navigate(RouteName.INPUT)
                 },
-                expanded = expandedFab,
-                text = { Text(R.string.new_memo.string) },
-                icon = { Icon(Icons.Filled.Add, contentDescription = R.string.compose.string) }
+                scrollBehavior = scrollBehavior,
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+                ),
             )
         },
-
+        floatingActionButton = {
+            if (showComposeFab) {
+                ExtendedFloatingActionButton(
+                    onClick = {
+                        rootNavController.navigate(RouteName.INPUT)
+                    },
+                    expanded = expandedFab,
+                    shape = MaterialTheme.shapes.large,
+                    containerColor = MeowmosTheme.colors.wayfindingContainer,
+                    contentColor = MeowmosTheme.colors.onWayfindingContainer,
+                    elevation = FloatingActionButtonDefaults.elevation(
+                        defaultElevation = 2.dp,
+                        pressedElevation = 4.dp,
+                    ),
+                    text = { Text(stringResource(R.string.new_memo)) },
+                    icon = {
+                        Icon(
+                            imageVector = Icons.Filled.Add,
+                            contentDescription = stringResource(R.string.compose),
+                        )
+                    },
+                )
+            }
+        },
         content = { innerPadding ->
             MemosList(
                 onMemoClick = onMemoClick,
                 lazyListState = listState,
                 contentPadding = innerPadding,
-                additionalBottomPadding = MemoListFabAvoidancePadding,
+                additionalBottomPadding = if (showComposeFab) MemoListFabAvoidancePadding else 20.dp,
                 onRefresh = { requestManualSync() },
+                showComments = true,
                 onTagClick = { tag ->
-                    navController.navigate("${RouteName.TAG}/${URLEncoder.encode(tag, "UTF-8")}") {
+                    rootNavController.navigate("${RouteName.TAG}/${Uri.encode(tag)}") {
                         launchSingleTop = true
                         restoreState = true
                     }
-                }
+                },
             )
-        }
+        },
     )
 
     when (val alert = syncAlert) {
@@ -156,7 +185,7 @@ private fun MemosHomePageContent(
                     TextButton(onClick = { syncAlert = null }) {
                         Text(R.string.close.string)
                     }
-                }
+                },
             )
         }
         is HomeSyncAlert.RequiresConfirmation -> {
@@ -171,7 +200,7 @@ private fun MemosHomePageContent(
                             scope.launch {
                                 requestManualSync(allowHigherV1Version = alert.version)
                             }
-                        }
+                        },
                     ) {
                         Text(R.string.still_sync.string)
                     }
@@ -180,7 +209,7 @@ private fun MemosHomePageContent(
                     TextButton(onClick = { syncAlert = null }) {
                         Text(R.string.cancel.string)
                     }
-                }
+                },
             )
         }
         is HomeSyncAlert.Failed -> {
@@ -192,7 +221,7 @@ private fun MemosHomePageContent(
                     TextButton(onClick = { syncAlert = null }) {
                         Text(R.string.close.string)
                     }
-                }
+                },
             )
         }
     }

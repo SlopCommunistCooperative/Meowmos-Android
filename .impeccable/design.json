@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-26T21:05:00+08:00",
+  "title": "Design System: Meowmos",
+  "seededFrom": {
+    "world": "wayfinding-cartography-signage-terminal-yellow-wayfinding",
+    "seed": "seed:153c8f71b89770ea"
+  },
+  "extensions": {
+    "colorMeta": {
+      "signal-yellow": {
+        "role": "accent",
+        "displayName": "Schiphol Signal Yellow",
+        "canonical": "#f4cc00",
+        "tonalRamp": ["#493b00", "#5e4c00", "#d9b400", "#f4cc00", "#ffe15a"]
+      },
+      "plaster-surface": {
+        "role": "neutral",
+        "displayName": "Terminal Plaster",
+        "canonical": "#f5f5f0",
+        "tonalRamp": ["#111210", "#181916", "#1f211c", "#e8e8df", "#f5f5f0", "#ffffff"]
+      },
+      "arrival-teal-light": {
+        "role": "tertiary",
+        "displayName": "Arrival Teal",
+        "canonical": "#005d52",
+        "tonalRamp": ["#00201c", "#004f45", "#005d52", "#7fd5c7", "#c4efe7"]
+      }
+    },
+    "typographyMeta": {
+      "display-small": { "displayName": "Display Small (Tabular)", "purpose": "MePage 3-column metrics counters." },
+      "title-large": { "displayName": "Title Large", "purpose": "TopAppBar screen titles." },
+      "body-large": { "displayName": "Body Large", "purpose": "Primary Markdown memo body." },
+      "label-small": { "displayName": "Label Small (Tabular)", "purpose": "Wayfinding badges, heatmap weekday axes, and counts." }
+    },
+    "shadows": [
+      { "name": "tonal-outline", "value": "0 0 0 1px #c9cac0", "purpose": "Structural separation for cards over the plaster ground." },
+      { "name": "fab-rest", "value": "0 2px 6px rgba(20,21,19,0.16)", "purpose": "Compact-width Extended FAB resting elevation." }
+    ],
+    "motion": [
+      { "name": "m3-standard-motion", "value": "Material 3 1.4.0 MaterialTheme motion tokens", "purpose": "Spatial and effects transitions for M3 1.4.0 components." },
+      { "name": "tab-fade-through", "value": "180ms fadeIn / 140ms fadeOut", "purpose": "Top-level bottom bar and navigation rail switching." }
+    ],
+    "breakpoints": [
+      { "name": "compact", "value": "< 600dp (ShortNavigationBar)" },
+      { "name": "medium", "value": ">= 600dp (NavigationRail)" },
+      { "name": "expanded-two-pane", "value": ">= 840dp (List-Detail two-pane)" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Wayfinding Signal Badge",
+      "kind": "chip",
+      "refersTo": "wayfinding-badge-signal",
+      "description": "High-contrast 4dp-radius badge for pinned notes, active space destination, and tag header.",
+      "html": "<span class=\"ds-badge\">PINNED</span>",
+      "css": ".ds-badge { background:#f4cc00; color:#181500; font:600 11px/14px Roboto,sans-serif; padding:3px 7px; border-radius:4px; letter-spacing:0.45px; display:inline-flex; align-items:center; }"
+    },
+    {
+      "name": "Memo Card",
+      "kind": "card",
+      "refersTo": "memo-card",
+      "description": "16dp-radius card resting on plaster ground with 1dp outline and wayfinding metadata bar.",
+      "html": "<article class=\"ds-card\"><div class=\"ds-meta\"><span>5m ago</span><span class=\"ds-badge\">Family</span></div><p>Pick up groceries before dinner.</p></article>",
+      "css": ".ds-card { background:#ffffff; color:#141513; border:1px solid #c9cac0; border-radius:16px; padding:16px; font:400 16px/24px Roboto,sans-serif; } .ds-meta { display:flex; gap:8px; align-items:center; font:600 13px/18px Roboto,sans-serif; color:#464840; margin-bottom:8px; } .ds-badge { background:#1d1e1a; color:#f3f3ec; font:600 11px/14px Roboto,sans-serif; padding:3px 7px; border-radius:4px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Terminal Yellow Wayfinding on Material 3 Expressive",
+    "overview": "Meowmos pairs Jetpack Compose Material 3 Expressive components with disciplined airport wayfinding contrast so family and group members instantly recognize note spaces, sync states, and destinations.",
+    "keyCharacteristics": [
+      "Adaptive 4-tab ShortNavigationBar (3 tabs for local accounts) and >=600dp NavigationRail",
+      "Signal Yellow reserved exclusively for active navigation, primary FAB, pinned markers, and space selection",
+      "All #tags searchable and browsable inside SearchPage",
+      "Theme-adaptive 5-step heatmap and tabular metrics inside MePage"
+    ],
+    "rules": [
+      { "name": "Signal Discipline", "body": "Reserve Signal Yellow for wayfinding signals only; never flood body surfaces.", "section": "colors" },
+      { "name": "Single Primary FAB", "body": "Render the compose FAB in the NavigationRail header on wide screens and in MemosHomePage on compact screens.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do keep Material You dynamic color active on Android 12+ with seamless static fallback.",
+      "Do preserve Spaces destination memory, autosave, comments preview/reply, and predictive Back."
+    ],
+    "donts": [
+      "Don't reintroduce a navigation drawer.",
+      "Don't hardcode hex colors inside UI composables."
+    ]
+  }
+}

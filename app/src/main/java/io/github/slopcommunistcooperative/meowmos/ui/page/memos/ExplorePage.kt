@@ -1,45 +1,44 @@
 package io.github.slopcommunistcooperative.meowmos.ui.page.memos
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
-import kotlinx.coroutines.launch
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.stringResource
 import io.github.slopcommunistcooperative.meowmos.R
-import io.github.slopcommunistcooperative.meowmos.ext.string
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ExplorePage(
-    drawerState: DrawerState? = null
-) {
-    val scope = rememberCoroutineScope()
+fun ExplorePage() {
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
     Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
             TopAppBar(
-                title = { Text(text = R.string.explore.string) },
-                navigationIcon = {
-                    if (drawerState != null) {
-                        IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                            Icon(Icons.Filled.Menu, contentDescription = R.string.menu.string)
-                        }
-                    }
-                }
+                title = {
+                    Text(
+                        text = stringResource(R.string.explore),
+                        style = MaterialTheme.typography.titleLarge,
+                    )
+                },
+                scrollBehavior = scrollBehavior,
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+                ),
             )
         },
-
         content = { innerPadding ->
             ExploreList(
-                contentPadding = innerPadding
+                contentPadding = innerPadding,
             )
-        }
+        },
     )
 }

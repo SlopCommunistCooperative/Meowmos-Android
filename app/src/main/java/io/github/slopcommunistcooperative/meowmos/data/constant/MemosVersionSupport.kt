@@ -18,6 +18,7 @@ object MemosVersionSupport {
     // `/api/v1` prefix; MemosApiPathInterceptor handles the new paths.
     val MEMOS_CALVER_MIN_VERSION = SemVer(26, 10, 0)
     val MEMOS_CALVER_MAX_VERSION = SemVer(26, 11, 2)
+    internal val MEMOS_COMMENT_PARENT_MIN_VERSION = SemVer(26, 11, 2)
 
     fun supportedVersionsMessage(context: Context): String {
         return context.getString(

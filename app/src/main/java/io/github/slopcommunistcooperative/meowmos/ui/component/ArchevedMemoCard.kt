@@ -47,18 +47,23 @@ fun ArchivedMemoCard(
 ) {
     Card(
         modifier = Modifier
-            .padding(horizontal = 15.dp, vertical = 10.dp)
-            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 6.dp)
+            .fillMaxWidth(),
+        shape = MaterialTheme.shapes.medium,
+        colors = meowmosCardColors(),
+        border = meowmosCardBorder(),
     ) {
         Column {
             Row(
-                modifier = Modifier.padding(start = 15.dp).fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
+                modifier = Modifier
+                    .padding(start = 16.dp, end = 4.dp, top = 4.dp)
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
                     DateUtils.getRelativeTimeSpanString(memo.date.toEpochMilli(), System.currentTimeMillis(), DateUtils.SECOND_IN_MILLIS).toString(),
                     style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.outline
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 ArchivedMemosCardActionButton(memo)

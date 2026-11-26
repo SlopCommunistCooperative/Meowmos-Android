@@ -39,6 +39,9 @@ import androidx.compose.material.icons.outlined.Tag
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -84,6 +87,7 @@ import io.github.slopcommunistcooperative.meowmos.ui.component.Attachment
 import io.github.slopcommunistcooperative.meowmos.ui.component.InputImage
 import io.github.slopcommunistcooperative.meowmos.ui.component.MemoLocationRow
 import io.github.slopcommunistcooperative.meowmos.viewmodel.MemoInputViewModel
+import io.github.slopcommunistcooperative.meowmos.ui.theme.MeowmosTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -146,9 +150,31 @@ internal fun MemoSpacePicker(
             ?: name.substringAfter('/')
     } ?: noSpace
 
+    val hasSelectedSpace = selected != null
     Box {
-        TextButton(onClick = { expanded = true }) {
-            Text(label, Modifier.widthIn(max = 112.dp), maxLines = 1, overflow = TextOverflow.Ellipsis)
+        FilledTonalButton(
+            onClick = { expanded = true },
+            shape = MaterialTheme.shapes.small,
+            colors = if (hasSelectedSpace) {
+                ButtonDefaults.filledTonalButtonColors(
+                    containerColor = MeowmosTheme.colors.wayfindingContainer,
+                    contentColor = MeowmosTheme.colors.onWayfindingContainer,
+                )
+            } else {
+                ButtonDefaults.filledTonalButtonColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            },
+            contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 10.dp, vertical = 4.dp),
+        ) {
+            Text(
+                label,
+                Modifier.widthIn(max = 112.dp),
+                style = MaterialTheme.typography.labelLarge,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
             Icon(
                 Icons.Filled.ArrowDropDown,
                 contentDescription = stringResource(R.string.memo_select_space),
@@ -168,6 +194,48 @@ internal fun MemoSpacePicker(
                     },
                 )
             }
+        }
+    }
+}
+
+@Composable
+internal fun MemoVisibilityPicker(
+    currentVisibility: MemoVisibility,
+    showSpaceVisibility: Boolean,
+    expanded: Boolean,
+    onExpandedChange: (Boolean) -> Unit,
+    onVisibilitySelected: (MemoVisibility) -> Unit,
+    enabled: Boolean = true,
+    label: String = stringResource(currentVisibility.titleResource),
+) {
+    Box {
+        DropdownMenu(
+            expanded = expanded && enabled,
+            onDismissRequest = { onExpandedChange(false) },
+            properties = PopupProperties(focusable = false)
+        ) {
+            for (visibility in MemoVisibility.entries) {
+                if (visibility == MemoVisibility.SPACE && !showSpaceVisibility) continue
+
+                val title = stringResource(visibility.titleResource)
+                DropdownMenuItem(
+                    text = { Text(title) },
+                    onClick = {
+                        onVisibilitySelected(visibility)
+                        onExpandedChange(false)
+                    },
+                    enabled = enabled,
+                    leadingIcon = { Icon(visibility.icon, contentDescription = title) },
+                    trailingIcon = {
+                        if (currentVisibility == visibility) {
+                            Icon(Icons.Outlined.Check, contentDescription = null)
+                        }
+                    }
+                )
+            }
+        }
+        ActionIconButton(label = label, enabled = enabled, onClick = { onExpandedChange(!expanded) }) {
+            Icon(currentVisibility.icon, contentDescription = label)
         }
     }
 }
@@ -227,42 +295,13 @@ internal fun MemoInputBottomBar(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 if (currentAccount !is Account.Local) {
-                    Box {
-                        DropdownMenu(
-                            expanded = visibilityMenuExpanded,
-                            onDismissRequest = { onVisibilityExpandedChange(false) },
-                            properties = PopupProperties(focusable = false)
-                        ) {
-                            MemoVisibility.entries
-                                .filter { it != MemoVisibility.SPACE || showSpaceVisibility }
-                                .forEach { visibility ->
-                                    DropdownMenuItem(
-                                        text = { Text(stringResource(visibility.titleResource)) },
-                                        onClick = {
-                                            onVisibilitySelected(visibility)
-                                            onVisibilityExpandedChange(false)
-                                        },
-                                        leadingIcon = {
-                                            Icon(
-                                                visibility.icon,
-                                                contentDescription = stringResource(visibility.titleResource)
-                                            )
-                                        },
-                                        trailingIcon = {
-                                            if (currentVisibility == visibility) {
-                                                Icon(Icons.Outlined.Check, contentDescription = null)
-                                            }
-                                        }
-                                    )
-                                }
-                        }
-                        ActionIconButton(label = stringResource(currentVisibility.titleResource), onClick = { onVisibilityExpandedChange(!visibilityMenuExpanded) }) {
-                            Icon(
-                                currentVisibility.icon,
-                                contentDescription = stringResource(currentVisibility.titleResource)
-                            )
-                        }
-                    }
+                    MemoVisibilityPicker(
+                        currentVisibility = currentVisibility,
+                        showSpaceVisibility = showSpaceVisibility,
+                        expanded = visibilityMenuExpanded,
+                        onExpandedChange = onVisibilityExpandedChange,
+                        onVisibilitySelected = onVisibilitySelected,
+                    )
                 }
 
                 if (tags.isEmpty()) {
@@ -325,6 +364,24 @@ internal fun MemoInputBottomBar(
     }
 }
 
+@Composable
+internal fun MemoEditorTextField(
+    modifier: Modifier,
+    text: TextFieldValue,
+    onTextChange: (TextFieldValue) -> Unit,
+    label: String,
+    enabled: Boolean = true,
+) {
+    OutlinedTextField(
+        modifier = modifier,
+        value = text,
+        label = { Text(label) },
+        onValueChange = onTextChange,
+        enabled = enabled,
+        keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences)
+    )
+}
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 internal fun MemoInputEditor(
@@ -375,16 +432,15 @@ internal fun MemoInputEditor(
                 }
             )
     ) {
-        OutlinedTextField(
+        MemoEditorTextField(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 20.dp, end = 20.dp, bottom = 20.dp)
                 .weight(1f)
                 .focusRequester(focusRequester),
-            value = text,
-            label = { Text(R.string.any_thoughts.string) },
-            onValueChange = onTextChange,
-            keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences)
+            text = text,
+            onTextChange = onTextChange,
+            label = R.string.any_thoughts.string
         )
 
         location?.let {

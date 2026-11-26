@@ -69,6 +69,15 @@
     <string name="memo_visibility_protected">本地使用者可見</string>
     <string name="memo_visibility_private">僅自己可見</string>
     <string name="memo_visibility_space">空間成員可見</string>
+    <string name="memo_comments">留言</string>
+    <string name="memo_comment_reply">回覆</string>
+    <string name="memo_comment_write">寫留言</string>
+    <string name="memo_comment_post">發佈留言</string>
+    <string name="memo_comment_visibility">誰可以看見這則留言？%1$s</string>
+    <string name="memo_comment_view_all">查看全部留言</string>
+    <string name="memo_comment_load_failed">無法載入留言。</string>
+    <string name="memo_comment_post_failed">無法發佈留言，請重試。</string>
+    <string name="memo_comment_hide">收合留言</string>
     <string name="memo_no_space">不歸入空間</string>
     <string name="memo_select_space">選擇發布空間</string>
     <string name="memo_space_unavailable">上次選擇的空間已無法使用。這則筆記僅自己可見。</string>

@@ -1,6 +1,8 @@
 package io.github.slopcommunistcooperative.meowmos.ui.page.settings
 
 import android.app.Activity
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
@@ -19,6 +21,8 @@ import androidx.compose.material.icons.outlined.Save
 import androidx.compose.material.icons.outlined.Source
 import androidx.compose.material.icons.outlined.Web
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Card
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import io.github.slopcommunistcooperative.meowmos.ui.component.ActionIconButton
@@ -55,6 +59,10 @@ import io.github.slopcommunistcooperative.meowmos.ext.popBackStackIfLifecycleIsR
 import io.github.slopcommunistcooperative.meowmos.ext.settingsDataStore
 import io.github.slopcommunistcooperative.meowmos.ext.string
 import io.github.slopcommunistcooperative.meowmos.ui.component.MemosIcon
+import io.github.slopcommunistcooperative.meowmos.ui.component.WayfindingSectionHeader
+import io.github.slopcommunistcooperative.meowmos.ui.component.meowmosCardBorder
+import io.github.slopcommunistcooperative.meowmos.ui.component.meowmosCardColors
+import io.github.slopcommunistcooperative.meowmos.ui.util.edgeToEdgeContentPadding
 import io.github.slopcommunistcooperative.meowmos.ui.page.common.RouteName
 import io.github.slopcommunistcooperative.meowmos.ui.security.AppLockAuthenticator
 import io.github.slopcommunistcooperative.meowmos.ui.security.AppLockSession
@@ -175,6 +183,7 @@ fun SettingsPage(
     Scaffold(
         modifier = Modifier
             .nestedScroll(scrollBehavior.nestedScrollConnection),
+        containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
             LargeTopAppBar(
                 title = { Text(text = R.string.settings.string) },
@@ -188,237 +197,208 @@ fun SettingsPage(
                         )
                     }
                 },
-                scrollBehavior = scrollBehavior
+                scrollBehavior = scrollBehavior,
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+                ),
             )
         }
     ) { innerPadding ->
-        LazyColumn(contentPadding = innerPadding) {
+        LazyColumn(
+            contentPadding = edgeToEdgeContentPadding(
+                contentPadding = innerPadding,
+                additionalBottomPadding = 24.dp,
+            ),
+        ) {
             item {
-                Text(
-                    R.string.accounts.string,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(24.dp, 10.dp),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.outline
-                )
-            }
+                WayfindingSectionHeader(title = R.string.accounts.string)
+                SettingsGroupCard {
+                    accounts.forEachIndexed { index, account ->
+                        if (index > 0) SettingsGroupDivider()
+                        when (account) {
+                            is Account.MemosV0 -> SettingItem(
+                                icon = MemosIcon,
+                                text = account.info.displayTitle(),
+                                subtitle = account.info.host,
+                                trailingIcon = {
+                                    if (currentAccount?.accountKey() == account.accountKey()) {
+                                        Icon(
+                                            Icons.Outlined.Check,
+                                            contentDescription = R.string.account_selected.string,
+                                            modifier = Modifier.padding(start = 16.dp),
+                                            tint = MaterialTheme.colorScheme.primary,
+                                        )
+                                    }
+                                },
+                            ) {
+                                navController.navigate("${RouteName.ACCOUNT}?accountKey=${account.accountKey()}")
+                            }
 
-            accounts.forEach { account ->
-                when (account) {
-                    is Account.MemosV0 -> item {
-                        SettingItem(
-                            icon = MemosIcon,
-                            text = account.info.displayTitle(),
-                            subtitle = account.info.host,
-                            trailingIcon = {
-                                if (currentAccount?.accountKey() == account.accountKey()) {
-                                    Icon(
-                                        Icons.Outlined.Check,
-                                        contentDescription = R.string.account_selected.string,
-                                        modifier = Modifier.padding(start = 16.dp),
-                                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    )
-                                }
-                            }) {
-                            navController.navigate("${RouteName.ACCOUNT}?accountKey=${account.accountKey()}")
+                            is Account.MemosV1 -> SettingItem(
+                                icon = MemosIcon,
+                                text = account.info.displayTitle(),
+                                subtitle = account.info.host,
+                                trailingIcon = {
+                                    if (currentAccount?.accountKey() == account.accountKey()) {
+                                        Icon(
+                                            Icons.Outlined.Check,
+                                            contentDescription = R.string.account_selected.string,
+                                            modifier = Modifier.padding(start = 16.dp),
+                                            tint = MaterialTheme.colorScheme.primary,
+                                        )
+                                    }
+                                },
+                            ) {
+                                navController.navigate("${RouteName.ACCOUNT}?accountKey=${account.accountKey()}")
+                            }
+
+                            is Account.Local -> SettingItem(
+                                icon = Icons.Outlined.Home,
+                                text = R.string.local_account.string,
+                                trailingIcon = {
+                                    if (currentAccount?.accountKey() == account.accountKey()) {
+                                        Icon(
+                                            Icons.Outlined.Check,
+                                            contentDescription = R.string.account_selected.string,
+                                            modifier = Modifier.padding(start = 16.dp),
+                                            tint = MaterialTheme.colorScheme.primary,
+                                        )
+                                    }
+                                },
+                            ) {
+                                navController.navigate("${RouteName.ACCOUNT}?accountKey=${account.accountKey()}")
+                            }
                         }
                     }
-
-                    is Account.MemosV1 -> item {
-                        SettingItem(
-                            icon = MemosIcon,
-                            text = account.info.displayTitle(),
-                            subtitle = account.info.host,
-                            trailingIcon = {
-                                if (currentAccount?.accountKey() == account.accountKey()) {
-                                    Icon(
-                                        Icons.Outlined.Check,
-                                        contentDescription = R.string.account_selected.string,
-                                        modifier = Modifier.padding(start = 16.dp),
-                                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    )
-                                }
-                            }) {
-                            navController.navigate("${RouteName.ACCOUNT}?accountKey=${account.accountKey()}")
-                        }
-                    }
-
-                    is Account.Local -> item {
-                        SettingItem(
-                            icon = Icons.Outlined.Home,
-                            text = R.string.local_account.string,
-                            trailingIcon = {
-                                if (currentAccount?.accountKey() == account.accountKey()) {
-                                    Icon(
-                                        Icons.Outlined.Check,
-                                        contentDescription = R.string.account_selected.string,
-                                        modifier = Modifier.padding(start = 16.dp),
-                                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    )
-                                }
-                            }) {
-                            navController.navigate("${RouteName.ACCOUNT}?accountKey=${account.accountKey()}")
-                        }
+                    if (accounts.isNotEmpty()) SettingsGroupDivider()
+                    SettingItem(icon = Icons.Outlined.PersonAdd, text = R.string.add_account.string) {
+                        navController.navigate(RouteName.ADD_ACCOUNT)
                     }
                 }
             }
 
             item {
-                SettingItem(icon = Icons.Outlined.PersonAdd, text = R.string.add_account.string) {
-                    navController.navigate(RouteName.ADD_ACCOUNT)
-                }
-            }
-
-            item {
-                Text(
-                    R.string.preferences.string,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(24.dp, 10.dp),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.outline
+                WayfindingSectionHeader(
+                    title = R.string.preferences.string,
+                    modifier = Modifier.padding(top = 12.dp),
                 )
-            }
-
-            item {
-                SettingItem(
-                    icon = Icons.Outlined.Language,
-                    text = R.string.language.string,
-                    trailingIcon = {
-                        Text(
-                            text = AppLanguage.options.firstOrNull { it.tag == selectedLanguage }?.displayName
-                                ?: R.string.language_system_default.string,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
+                SettingsGroupCard {
+                    SettingItem(
+                        icon = Icons.Outlined.Language,
+                        text = R.string.language.string,
+                        trailingIcon = {
+                            Text(
+                                text = AppLanguage.options.firstOrNull { it.tag == selectedLanguage }?.displayName
+                                    ?: R.string.language_system_default.string,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                style = MaterialTheme.typography.labelLarge,
+                            )
+                        },
+                    ) {
+                        showLanguageDialog = true
                     }
-                ) {
-                    showLanguageDialog = true
-                }
-            }
-
-            item {
-                SettingItem(
-                    icon = Icons.Outlined.Edit,
-                    text = R.string.edit_gesture.string,
-                    trailingIcon = {
-                        Text(
-                            text = currentEditGesture.titleResource.string,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
+                    SettingsGroupDivider()
+                    SettingItem(
+                        icon = Icons.Outlined.Edit,
+                        text = R.string.edit_gesture.string,
+                        trailingIcon = {
+                            Text(
+                                text = currentEditGesture.titleResource.string,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                style = MaterialTheme.typography.labelLarge,
+                            )
+                        },
+                    ) {
+                        showEditGestureDialog = true
                     }
-                ) {
-                    showEditGestureDialog = true
+                    SettingsGroupDivider()
+                    SettingSwitchItem(
+                        icon = Icons.Outlined.Save,
+                        text = R.string.autosave.string,
+                        subtitle = R.string.autosave_summary.string,
+                        checked = autosaveEnabled,
+                        onCheckedChange = ::setAutosaveEnabled,
+                    )
+                    SettingsGroupDivider()
+                    SettingSwitchItem(
+                        icon = Icons.Outlined.Archive,
+                        text = R.string.search_include_archived.string,
+                        subtitle = R.string.search_include_archived_summary.string,
+                        checked = searchIncludesArchived,
+                        onCheckedChange = ::setSearchIncludesArchived,
+                    )
                 }
             }
 
             item {
-                SettingSwitchItem(
-                    icon = Icons.Outlined.Save,
-                    text = R.string.autosave.string,
-                    subtitle = R.string.autosave_summary.string,
-                    checked = autosaveEnabled,
-                    onCheckedChange = ::setAutosaveEnabled,
+                WayfindingSectionHeader(
+                    title = R.string.security.string,
+                    modifier = Modifier.padding(top = 12.dp),
                 )
-            }
-
-            item {
-                SettingSwitchItem(
-                    icon = Icons.Outlined.Archive,
-                    text = R.string.search_include_archived.string,
-                    subtitle = R.string.search_include_archived_summary.string,
-                    checked = searchIncludesArchived,
-                    onCheckedChange = ::setSearchIncludesArchived,
-                )
-            }
-
-            item {
-                Text(
-                    R.string.security.string,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(24.dp, 10.dp),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.outline
-                )
-            }
-
-            item {
-                val appLockToggleEnabled = appLockSupported || settings.appLockEnabled
-                SettingSwitchItem(
-                    icon = Icons.Outlined.Lock,
-                    text = R.string.app_lock.string,
-                    subtitle = if (appLockSupported) {
-                        R.string.app_lock_summary.string
-                    } else {
-                        R.string.app_lock_unavailable_short.string
-                    },
-                    checked = settings.appLockEnabled,
-                    enabled = appLockToggleEnabled,
-                    onCheckedChange = ::setAppLockEnabled,
-                )
-            }
-            item {
-                SettingItem(
-                    icon = Icons.Outlined.Lock,
-                    text = R.string.client_certificate.string,
-                    subtitle = if (hasClientCertificate) {
-                        R.string.client_certificate_selected.string
-                    } else {
-                        R.string.client_certificate_not_selected.string
-                    }
-                ) {
-                    chooseClientCertificate()
-                }
-            }
-
-            if (hasClientCertificate) {
-                item {
+                SettingsGroupCard {
+                    val appLockToggleEnabled = appLockSupported || settings.appLockEnabled
+                    SettingSwitchItem(
+                        icon = Icons.Outlined.Lock,
+                        text = R.string.app_lock.string,
+                        subtitle = if (appLockSupported) {
+                            R.string.app_lock_summary.string
+                        } else {
+                            R.string.app_lock_unavailable_short.string
+                        },
+                        checked = settings.appLockEnabled,
+                        enabled = appLockToggleEnabled,
+                        onCheckedChange = ::setAppLockEnabled,
+                    )
+                    SettingsGroupDivider()
                     SettingItem(
                         icon = Icons.Outlined.Lock,
-                        text = R.string.remove_client_certificate.string,
-                        subtitle = R.string.remove_client_certificate_message.string
+                        text = R.string.client_certificate.string,
+                        subtitle = if (hasClientCertificate) {
+                            R.string.client_certificate_selected.string
+                        } else {
+                            R.string.client_certificate_not_selected.string
+                        },
                     ) {
-                        showRemoveCertificateDialog = true
+                        chooseClientCertificate()
+                    }
+                    if (hasClientCertificate) {
+                        SettingsGroupDivider()
+                        SettingItem(
+                            icon = Icons.Outlined.Lock,
+                            text = R.string.remove_client_certificate.string,
+                            subtitle = R.string.remove_client_certificate_message.string,
+                        ) {
+                            showRemoveCertificateDialog = true
+                        }
                     }
                 }
             }
 
             item {
-                Text(
-                    R.string.about.string,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(24.dp, 10.dp),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.outline
+                WayfindingSectionHeader(
+                    title = R.string.about.string,
+                    modifier = Modifier.padding(top = 12.dp),
                 )
-            }
-
-            item {
-                SettingItem(icon = Icons.Outlined.Web, text = R.string.website.string) {
-                    uriHandler.openUri("https://github.com/SlopCommunistCooperative/Meowmos-Android")
-                }
-            }
-
-            item {
-                SettingItem(icon = Icons.Outlined.Lock, text = R.string.privacy_policy.string) {
-                    uriHandler.openUri("https://memos.moe/privacy")
-                }
-            }
-
-            item {
-                SettingItem(icon = Icons.Outlined.Source, text = R.string.acknowledgements.string) {
-                    uriHandler.openUri("https://memos.moe/android-acknowledgements")
-                }
-            }
-
-            item {
-                SettingItem(
-                    icon = Icons.Outlined.BugReport,
-                    text = R.string.report_an_issue.string
-                ) {
-                    uriHandler.openUri("https://github.com/SlopCommunistCooperative/Meowmos-Android/issues")
+                SettingsGroupCard {
+                    SettingItem(icon = Icons.Outlined.Web, text = R.string.website.string) {
+                        uriHandler.openUri("https://github.com/SlopCommunistCooperative/Meowmos-Android")
+                    }
+                    SettingsGroupDivider()
+                    SettingItem(icon = Icons.Outlined.Lock, text = R.string.privacy_policy.string) {
+                        uriHandler.openUri("https://memos.moe/privacy")
+                    }
+                    SettingsGroupDivider()
+                    SettingItem(icon = Icons.Outlined.Source, text = R.string.acknowledgements.string) {
+                        uriHandler.openUri("https://memos.moe/android-acknowledgements")
+                    }
+                    SettingsGroupDivider()
+                    SettingItem(
+                        icon = Icons.Outlined.BugReport,
+                        text = R.string.report_an_issue.string,
+                    ) {
+                        uriHandler.openUri("https://github.com/SlopCommunistCooperative/Meowmos-Android/issues")
+                    }
                 }
             }
         }
@@ -540,6 +520,32 @@ fun SettingsPage(
     }
 }
 
+
+@Composable
+private fun SettingsGroupCard(
+    content: @Composable () -> Unit,
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        shape = MaterialTheme.shapes.medium,
+        colors = meowmosCardColors(),
+        border = meowmosCardBorder(),
+    ) {
+        Column(Modifier.fillMaxWidth()) {
+            content()
+        }
+    }
+}
+
+@Composable
+private fun SettingsGroupDivider() {
+    HorizontalDivider(
+        modifier = Modifier.padding(horizontal = 16.dp),
+        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.6f),
+    )
+}
 @Composable
 private fun LanguageChoiceRow(
     text: String,

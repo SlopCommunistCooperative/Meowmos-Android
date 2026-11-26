@@ -29,6 +29,7 @@ import io.github.slopcommunistcooperative.meowmos.ui.page.memoinput.MemoInputPag
 import io.github.slopcommunistcooperative.meowmos.ui.page.memos.MemoDetailPage
 import io.github.slopcommunistcooperative.meowmos.ui.page.memos.MemosPage
 import io.github.slopcommunistcooperative.meowmos.ui.page.memos.SearchPage
+import io.github.slopcommunistcooperative.meowmos.ui.page.memos.ArchivedMemoPage
 import io.github.slopcommunistcooperative.meowmos.ui.page.memos.TagMemoPage
 import io.github.slopcommunistcooperative.meowmos.ui.page.resource.ResourceListPage
 import io.github.slopcommunistcooperative.meowmos.ui.page.settings.SettingsPage
@@ -99,6 +100,10 @@ fun Navigation() {
 
                 composable(RouteName.RESOURCE) {
                     ResourceListPage(navController = navController)
+                }
+
+                composable(RouteName.ARCHIVED) {
+                    ArchivedMemoPage(navController = navController)
                 }
 
                 composable("${RouteName.ACCOUNT}?accountKey={accountKey}") { entry ->

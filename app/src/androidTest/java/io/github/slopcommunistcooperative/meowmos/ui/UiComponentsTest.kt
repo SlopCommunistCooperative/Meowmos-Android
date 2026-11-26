@@ -1,15 +1,12 @@
 package io.github.slopcommunistcooperative.meowmos.ui
 
+import android.content.res.Configuration
+import java.util.Locale
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.Save
-import androidx.compose.material3.DrawerState
-import androidx.compose.material3.DrawerValue
-import androidx.compose.material3.ModalDrawerSheet
-import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -54,7 +51,9 @@ import io.github.slopcommunistcooperative.meowmos.ui.component.ActionIconButton
 import io.github.slopcommunistcooperative.meowmos.ui.page.memoinput.MemoInputTopBar
 import io.github.slopcommunistcooperative.meowmos.ui.page.memoinput.MemoSpacePicker
 import io.github.slopcommunistcooperative.meowmos.ui.page.memos.MemoListDetailLayout
-import io.github.slopcommunistcooperative.meowmos.ui.page.memos.MemosNavigationDrawer
+import io.github.slopcommunistcooperative.meowmos.ui.page.common.RouteName
+import io.github.slopcommunistcooperative.meowmos.ui.page.memos.MeowmosDestination
+import io.github.slopcommunistcooperative.meowmos.ui.page.memos.MemosNavigationScaffold
 import io.github.slopcommunistcooperative.meowmos.ui.page.memos.MemoSearchBar
 import io.github.slopcommunistcooperative.meowmos.ui.page.memos.PagingStatus
 import io.github.slopcommunistcooperative.meowmos.ui.page.settings.SettingSwitchItem
@@ -117,21 +116,37 @@ class UiComponentsTest {
         compose.runOnIdle { assertEquals(listOf("spaces/family"), publishedTo) }
     }
 
-    @Test fun drawerHandlesSystemBackWithoutACustomHandler() {
-        var drawer: DrawerState? = null
+    @Test fun bottomNavigationSwitchesDestinationsAndRespectsDestinationList() {
+        var selected by mutableStateOf(RouteName.MEMOS)
+        val localDestinations = MeowmosDestination.entries.filterNot { it == MeowmosDestination.EXPLORE }
         compose.setContent {
             MaterialTheme {
-                val state = rememberDrawerState(DrawerValue.Open)
-                drawer = state
-                ModalNavigationDrawer(
-                    drawerState = state,
-                    drawerContent = { ModalDrawerSheet(drawerState = state) { Text("Drawer") } },
-                ) { Text("Main content") }
+                MemosNavigationScaffold(
+                    useRail = false,
+                    destinations = localDestinations,
+                    selectedRoute = selected,
+                    onSelectDestination = { selected = it.route },
+                    onCompose = {},
+                ) {
+                    Text("Active: $selected")
+                }
             }
         }
-        compose.onNodeWithText("Drawer").assertIsDisplayed()
-        Espresso.pressBack()
-        compose.runOnIdle { assertEquals(DrawerValue.Closed, requireNotNull(drawer).currentValue) }
+        compose.onNodeWithText(context.getString(R.string.memos)).assertIsDisplayed()
+        compose.onNodeWithText(context.getString(R.string.resources)).assertIsDisplayed()
+        compose.onNodeWithText(context.getString(R.string.nav_me)).assertIsDisplayed()
+        compose.onAllNodesWithText(context.getString(R.string.explore)).assertCountEquals(0)
+        compose.onNodeWithText(context.getString(R.string.nav_me)).performClick()
+        compose.onNodeWithText("Active: ${RouteName.ME}").assertIsDisplayed()
+
+        val zhConfig = Configuration(context.resources.configuration).apply {
+            setLocale(Locale.SIMPLIFIED_CHINESE)
+        }
+        val zhContext = context.createConfigurationContext(zhConfig)
+        assertEquals(
+            listOf("笔记", "探索", "资源", "我"),
+            MeowmosDestination.entries.map { zhContext.getString(it.labelRes) },
+        )
     }
 
     @Test fun settingRowExposesOneSwitchAndTogglesFromItsLabel() {
@@ -237,7 +252,13 @@ class UiComponentsTest {
         compose.setContent {
             MaterialTheme {
                 CompositionLocalProvider(LocalDensity provides Density(if (wide) 0.5f else 4f)) {
-                    MemosNavigationDrawer(permanent = wide, drawerContent = { Text("Navigation") }) {
+                    MemosNavigationScaffold(
+                        useRail = wide,
+                        destinations = MeowmosDestination.entries,
+                        selectedRoute = RouteName.MEMOS,
+                        onSelectDestination = {},
+                        onCompose = {},
+                    ) {
                         MemoListDetailLayout(
                             listPane = { select -> Button(onClick = { select("memo-two") }) { Text("List") } },
                             detailPane = { id, _ -> Text(id) },

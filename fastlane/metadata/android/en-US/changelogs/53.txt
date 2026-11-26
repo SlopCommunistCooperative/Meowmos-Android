@@ -1,0 +1,3 @@
+## What's Changed
+* Publish notes to Memos Spaces. The editor remembers the last space for each account.
+* Read comments below each note, or preview them and reply from Home and Explore. The comment editor remembers your audience choice for each account.
