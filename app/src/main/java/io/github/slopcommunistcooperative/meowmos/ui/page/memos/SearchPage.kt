@@ -14,10 +14,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.outlined.Tag
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Card
@@ -38,9 +34,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -77,9 +75,6 @@ fun SearchPage(
         ?.searchIncludesArchived
         ?: false
 
-    LaunchedEffect(Unit) {
-        memosViewModel.loadTags()
-    }
     LaunchedEffect(includeArchived) {
         if (includeArchived) archivedViewModel.loadMemos()
     }
@@ -196,7 +191,7 @@ private fun SearchTagsPanel(
                             },
                             leadingIcon = {
                                 Icon(
-                                    imageVector = Icons.Outlined.Tag,
+                                    imageVector = ImageVector.vectorResource(R.drawable.symbol_tag),
                                     contentDescription = null,
                                     modifier = Modifier.size(16.dp),
                                 )
@@ -244,7 +239,7 @@ internal fun MemoSearchBar(searchText: TextFieldState, onBack: () -> Unit) {
                 placeholder = { Text(stringResource(R.string.search)) },
                 leadingIcon = {
                     ActionIconButton(label = stringResource(R.string.back), onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = null)
+                        Icon(ImageVector.vectorResource(R.drawable.symbol_arrow_back), contentDescription = null)
                     }
                 },
                 trailingIcon = {
@@ -256,7 +251,7 @@ internal fun MemoSearchBar(searchText: TextFieldState, onBack: () -> Unit) {
                                 focusRequester.requestFocus()
                             },
                         ) {
-                            Icon(Icons.Filled.Close, contentDescription = null)
+                            Icon(ImageVector.vectorResource(R.drawable.symbol_close), contentDescription = null)
                         }
                     }
                 },

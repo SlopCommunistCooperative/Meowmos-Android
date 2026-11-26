@@ -8,12 +8,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.outlined.Attachment
-import androidx.compose.material.icons.outlined.PhotoLibrary
+import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -25,18 +23,21 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import io.github.slopcommunistcooperative.meowmos.R
 import io.github.slopcommunistcooperative.meowmos.ext.popBackStackIfLifecycleIsResumed
@@ -46,6 +47,7 @@ import io.github.slopcommunistcooperative.meowmos.ui.component.MemoImage
 import io.github.slopcommunistcooperative.meowmos.ui.component.MeowmosEmptyState
 import io.github.slopcommunistcooperative.meowmos.ui.theme.MeowmosTheme
 import io.github.slopcommunistcooperative.meowmos.viewmodel.ResourceListViewModel
+import io.github.slopcommunistcooperative.meowmos.viewmodel.LocalUserState
 import androidx.compose.foundation.lazy.items as lazyItems
 import androidx.compose.foundation.lazy.staggeredgrid.items as staggeredGridItems
 
@@ -64,8 +66,14 @@ fun ResourceListPage(
     val lifecycleOwner = LocalLifecycleOwner.current
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     var selectedFilter by rememberSaveable { mutableStateOf(ResourceFilter.IMAGE) }
-    val imageResources = viewModel.resources.filter { it.mimeType?.startsWith("image/") == true }
-    val otherResources = viewModel.resources.filterNot { it.mimeType?.startsWith("image/") == true }
+    val resources by viewModel.resources.collectAsStateWithLifecycle()
+    val account by LocalUserState.current.currentAccount.collectAsStateWithLifecycle()
+    val accountKey = account?.accountKey()
+    val (imageResources, otherResources) = remember(resources, accountKey) {
+        resources.filter { it.accountKey == accountKey }.partition { it.mimeType?.startsWith("image/") == true }
+    }
+    val imageScroll = rememberLazyStaggeredGridState()
+    val otherScroll = rememberLazyListState()
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -87,7 +95,7 @@ fun ResourceListPage(
                             },
                         ) {
                             Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                imageVector = ImageVector.vectorResource(R.drawable.symbol_arrow_back),
                                 contentDescription = stringResource(R.string.back),
                             )
                         }
@@ -137,12 +145,13 @@ fun ResourceListPage(
             if (selectedFilter == ResourceFilter.IMAGE) {
                 if (imageResources.isEmpty()) {
                     MeowmosEmptyState(
-                        icon = Icons.Outlined.PhotoLibrary,
+                        icon = ImageVector.vectorResource(R.drawable.symbol_photo_library),
                         title = stringResource(R.string.no_resources),
                     )
                 } else {
                     LazyVerticalStaggeredGrid(
                         columns = StaggeredGridCells.Adaptive(minSize = 156.dp),
+                        state = imageScroll,
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(horizontal = 16.dp),
@@ -164,11 +173,12 @@ fun ResourceListPage(
             } else {
                 if (otherResources.isEmpty()) {
                     MeowmosEmptyState(
-                        icon = Icons.Outlined.Attachment,
+                        icon = ImageVector.vectorResource(R.drawable.symbol_attachment),
                         title = stringResource(R.string.no_resources),
                     )
                 } else {
                     LazyColumn(
+                        state = otherScroll,
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(horizontal = 16.dp),
@@ -182,9 +192,5 @@ fun ResourceListPage(
                 }
             }
         }
-    }
-
-    LaunchedEffect(Unit) {
-        viewModel.loadResources()
     }
 }

@@ -1,5 +1,6 @@
 package io.github.slopcommunistcooperative.meowmos.ui.page.memos
 
+import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -10,16 +11,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Explore
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.PhotoLibrary
-import androidx.compose.material.icons.automirrored.filled.StickyNote2
-import androidx.compose.material.icons.automirrored.outlined.StickyNote2
-import androidx.compose.material.icons.outlined.Explore
-import androidx.compose.material.icons.outlined.Person
-import androidx.compose.material.icons.outlined.PhotoLibrary
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -44,11 +35,13 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.window.core.layout.WindowSizeClass
@@ -62,32 +55,32 @@ import io.github.slopcommunistcooperative.meowmos.viewmodel.LocalUserState
 internal enum class MeowmosDestination(
     val route: String,
     @param:StringRes val labelRes: Int,
-    val selectedIcon: ImageVector,
-    val unselectedIcon: ImageVector,
+    @param:DrawableRes val selectedIcon: Int,
+    @param:DrawableRes val unselectedIcon: Int,
 ) {
     MEMOS(
         route = RouteName.MEMOS,
         labelRes = R.string.memos,
-        selectedIcon = Icons.AutoMirrored.Filled.StickyNote2,
-        unselectedIcon = Icons.AutoMirrored.Outlined.StickyNote2,
+        selectedIcon = R.drawable.symbol_sticky_note_2_fill1,
+        unselectedIcon = R.drawable.symbol_sticky_note_2,
     ),
     EXPLORE(
         route = RouteName.EXPLORE,
         labelRes = R.string.explore,
-        selectedIcon = Icons.Filled.Explore,
-        unselectedIcon = Icons.Outlined.Explore,
+        selectedIcon = R.drawable.symbol_explore_fill1,
+        unselectedIcon = R.drawable.symbol_explore,
     ),
     RESOURCES(
         route = RouteName.RESOURCE,
         labelRes = R.string.resources,
-        selectedIcon = Icons.Filled.PhotoLibrary,
-        unselectedIcon = Icons.Outlined.PhotoLibrary,
+        selectedIcon = R.drawable.symbol_photo_library_fill1,
+        unselectedIcon = R.drawable.symbol_photo_library,
     ),
     ME(
         route = RouteName.ME,
         labelRes = R.string.nav_me,
-        selectedIcon = Icons.Filled.Person,
-        unselectedIcon = Icons.Outlined.Person,
+        selectedIcon = R.drawable.symbol_person_fill1,
+        unselectedIcon = R.drawable.symbol_person,
     ),
 }
 
@@ -117,13 +110,7 @@ fun MemosPage() {
 
     LaunchedEffect(hasExplore, selectedRoute) {
         if (!hasExplore && currentDestination?.route == RouteName.EXPLORE) {
-            memosNavController.navigate(RouteName.MEMOS) {
-                popUpTo(memosNavController.graph.findStartDestination().id) {
-                    saveState = true
-                }
-                launchSingleTop = true
-                restoreState = true
-            }
+            memosNavController.navigateToMemoTab(RouteName.MEMOS)
         }
     }
 
@@ -133,13 +120,7 @@ fun MemosPage() {
         selectedRoute = selectedRoute,
         onSelectDestination = { destination ->
             if (destination.route != selectedRoute) {
-                memosNavController.navigate(destination.route) {
-                    popUpTo(memosNavController.graph.findStartDestination().id) {
-                        saveState = true
-                    }
-                    launchSingleTop = true
-                    restoreState = true
-                }
+                memosNavController.navigateToMemoTab(destination.route)
             }
         },
         onCompose = {
@@ -150,6 +131,14 @@ fun MemosPage() {
             navController = memosNavController,
             showHomeComposeFab = !inRailLayout,
         )
+    }
+}
+
+internal fun NavHostController.navigateToMemoTab(route: String) {
+    navigate(route) {
+        popUpTo(graph.findStartDestination().id) { saveState = true }
+        launchSingleTop = true
+        restoreState = true
     }
 }
 
@@ -194,7 +183,7 @@ internal fun MemosNavigationScaffold(
                         ),
                     ) {
                         Icon(
-                            imageVector = Icons.Filled.Add,
+                            imageVector = ImageVector.vectorResource(R.drawable.symbol_add),
                             contentDescription = stringResource(R.string.new_memo),
                         )
                     }
@@ -209,7 +198,7 @@ internal fun MemosNavigationScaffold(
                         onClick = { onSelectDestination(destination) },
                         icon = {
                             Icon(
-                                imageVector = if (selected) destination.selectedIcon else destination.unselectedIcon,
+                                imageVector = ImageVector.vectorResource(if (selected) destination.selectedIcon else destination.unselectedIcon),
                                 contentDescription = label,
                             )
                         },
@@ -261,7 +250,7 @@ internal fun MemosNavigationScaffold(
                                 onClick = { onSelectDestination(destination) },
                                 icon = {
                                     Icon(
-                                        imageVector = if (selected) destination.selectedIcon else destination.unselectedIcon,
+                                        imageVector = ImageVector.vectorResource(if (selected) destination.selectedIcon else destination.unselectedIcon),
                                         contentDescription = label,
                                     )
                                 },
@@ -274,7 +263,7 @@ internal fun MemosNavigationScaffold(
                                 },
                                 colors = ShortNavigationBarItemDefaults.colors(
                                     selectedIconColor = onWayfindingContainer,
-                                    selectedTextColor = MaterialTheme.colorScheme.onSurface,
+                                    selectedTextColorTopIconPosition = MaterialTheme.colorScheme.onSurface,
                                     selectedIndicatorColor = wayfindingContainer,
                                     unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
                                     unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,

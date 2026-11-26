@@ -8,8 +8,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.LinearProgressIndicator
@@ -27,6 +25,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import io.github.slopcommunistcooperative.meowmos.R
@@ -63,7 +63,7 @@ fun LocalAccountPage(
                 Column(Modifier.padding(16.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
-                            imageVector = Icons.Outlined.Home,
+                            imageVector = ImageVector.vectorResource(R.drawable.symbol_home),
                             contentDescription = null,
                             modifier = Modifier
                                 .padding(end = 8.dp)

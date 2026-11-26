@@ -17,7 +17,7 @@ object MeowmosSpacing {
 
 /**
  * Semantic design tokens derived from the active Material 3 [ColorScheme] so both the static
- * Terminal Yellow Wayfinding palette and Android 12+ Material You dynamic color stay coherent.
+ * Terminal Yellow Wayfinding palette and Material You dynamic color stay coherent.
  */
 @Immutable
 data class MeowmosExtendedColors(

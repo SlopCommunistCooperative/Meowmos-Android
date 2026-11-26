@@ -12,7 +12,7 @@ Meowmos supports Memos 0.21.0, 0.27.0 through 0.31.0, and 26.10 through 26.11.2.
 
 ## Installation
 
-Download the APK from [Meowmos releases](https://github.com/SlopCommunistCooperative/Meowmos-Android/releases).
+Meowmos requires Android 15 (API 35) or later. Download the APK from [Meowmos releases](https://github.com/SlopCommunistCooperative/Meowmos-Android/releases).
 
 ## Features
 
@@ -20,7 +20,7 @@ Download the APK from [Meowmos releases](https://github.com/SlopCommunistCoopera
 - Write offline and sync when you're back online.
 - On servers that support Spaces, use the menu next to Post to choose a space you belong to. Meowmos remembers that choice for new notes on the same account. Until you choose a space, new notes have no space. Selecting a space defaults the note's visibility to its members.
 - On supported Memos servers, read comments below a note, or preview them and reply directly from Home and Explore. Posting requires a connection. The editor starts with the note's audience or a compatible audience you last selected on that account.
-- Use Material You themes and a themed app icon.
+- Meowmos uses Material 3 Expressive and supports themed app icons. To use the Meowmos palette instead of system colors, turn off **Material You colors** under Preferences in Settings.
 - Write and preview Markdown, add images and files, and check off tasks.
 - Find notes with search and tags. Pin notes you want to keep at the top.
 - Open notes from the home screen widget. Share text, images, and web links to Meowmos from other apps.

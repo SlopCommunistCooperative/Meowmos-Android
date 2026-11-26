@@ -1,7 +1,5 @@
 package io.github.slopcommunistcooperative.meowmos.ui.page.memos
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -11,8 +9,10 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavHostController
 import io.github.slopcommunistcooperative.meowmos.R
@@ -46,7 +46,7 @@ fun ArchivedMemoPage(
                         },
                     ) {
                         Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            imageVector = ImageVector.vectorResource(R.drawable.symbol_arrow_back),
                             contentDescription = stringResource(R.string.back),
                         )
                     }

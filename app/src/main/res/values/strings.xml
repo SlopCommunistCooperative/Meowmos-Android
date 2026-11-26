@@ -108,6 +108,8 @@
     <string name="sync_status_unsynced">Unsynced changes</string>
     <string name="memo_sync_pending">Memo not synced</string>
     <string name="preferences">Preferences</string>
+    <string name="dynamic_color">Material You colors</string>
+    <string name="dynamic_color_summary">Use your system color palette</string>
     <string name="edit_gesture">Edit gesture</string>
     <string name="edit_gesture_none">None</string>
     <string name="edit_gesture_single">Single tap</string>

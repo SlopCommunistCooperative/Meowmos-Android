@@ -18,13 +18,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material.icons.automirrored.outlined.StickyNote2
-import androidx.compose.material.icons.outlined.PushPin
-import androidx.compose.material.icons.outlined.CloudOff
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import io.github.slopcommunistcooperative.meowmos.ui.component.ActionIconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -113,7 +110,7 @@ internal fun MemoDetailContent(memoIdentifier: String, onBack: () -> Unit) {
                 },
                 navigationIcon = {
                     ActionIconButton(label = R.string.back.string, onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = R.string.back.string)
+                        Icon(ImageVector.vectorResource(R.drawable.symbol_arrow_back), contentDescription = R.string.back.string)
                     }
                 },
                 actions = {
@@ -135,7 +132,7 @@ internal fun MemoDetailContent(memoIdentifier: String, onBack: () -> Unit) {
                 contentAlignment = Alignment.Center,
             ) {
                 MeowmosEmptyState(
-                    icon = Icons.AutoMirrored.Outlined.StickyNote2,
+                    icon = ImageVector.vectorResource(R.drawable.symbol_sticky_note_2),
                     title = R.string.memo_not_found.string,
                 )
             }
@@ -172,7 +169,7 @@ internal fun MemoDetailContent(memoIdentifier: String, onBack: () -> Unit) {
                 if (memo.pinned) {
                     WayfindingBadge(
                         text = stringResource(R.string.pinned),
-                        icon = Icons.Outlined.PushPin,
+                        icon = ImageVector.vectorResource(R.drawable.symbol_push_pin),
                         tone = WayfindingTone.Signal,
                     )
                 }
@@ -185,7 +182,7 @@ internal fun MemoDetailContent(memoIdentifier: String, onBack: () -> Unit) {
                 }
                 if (currentAccount !is Account.Local && memo.needsSync) {
                     Icon(
-                        imageVector = Icons.Outlined.CloudOff,
+                        imageVector = ImageVector.vectorResource(R.drawable.symbol_cloud_off),
                         contentDescription = R.string.memo_sync_pending.string,
                         modifier = Modifier.size(18.dp),
                         tint = MaterialTheme.colorScheme.error,

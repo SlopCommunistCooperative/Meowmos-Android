@@ -1,14 +1,14 @@
 package io.github.slopcommunistcooperative.meowmos.ui
 
 import android.content.res.Configuration
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
+import io.github.slopcommunistcooperative.meowmos.ui.theme.MeowmosTheme
 import java.util.Locale
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.text.input.rememberTextFieldState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.outlined.Save
 import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.CompositionLocalProvider
@@ -16,6 +16,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -41,21 +42,31 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import androidx.paging.LoadState
 import androidx.test.espresso.Espresso
 import androidx.test.platform.app.InstrumentationRegistry
 import kotlinx.coroutines.CompletableDeferred
 import io.github.slopcommunistcooperative.meowmos.R
 import io.github.slopcommunistcooperative.meowmos.data.model.MemoSpace
-import io.github.slopcommunistcooperative.meowmos.ui.component.ActionIconButton
+import io.github.slopcommunistcooperative.meowmos.data.model.MemoVisibility
+import io.github.slopcommunistcooperative.meowmos.ext.titleResource
+import io.github.slopcommunistcooperative.meowmos.ui.component.MemoMenuAction
+import io.github.slopcommunistcooperative.meowmos.ui.component.MemoOverflowMenu
+import io.github.slopcommunistcooperative.meowmos.ui.component.SyncStatusBadge
 import io.github.slopcommunistcooperative.meowmos.ui.page.memoinput.MemoInputTopBar
 import io.github.slopcommunistcooperative.meowmos.ui.page.memoinput.MemoSpacePicker
+import io.github.slopcommunistcooperative.meowmos.ui.page.memoinput.MemoVisibilityPicker
 import io.github.slopcommunistcooperative.meowmos.ui.page.memos.MemoListDetailLayout
 import io.github.slopcommunistcooperative.meowmos.ui.page.common.RouteName
 import io.github.slopcommunistcooperative.meowmos.ui.page.memos.MeowmosDestination
 import io.github.slopcommunistcooperative.meowmos.ui.page.memos.MemosNavigationScaffold
 import io.github.slopcommunistcooperative.meowmos.ui.page.memos.MemoSearchBar
 import io.github.slopcommunistcooperative.meowmos.ui.page.memos.PagingStatus
+import io.github.slopcommunistcooperative.meowmos.ui.page.memos.navigateToMemoTab
 import io.github.slopcommunistcooperative.meowmos.ui.page.settings.SettingSwitchItem
 import io.github.slopcommunistcooperative.meowmos.ui.util.edgeToEdgeContentPadding
 import org.junit.Assert.assertEquals
@@ -94,7 +105,7 @@ class UiComponentsTest {
         val preference = CompletableDeferred<MemoSpace>()
         val publishedTo = mutableListOf<String?>()
         compose.setContent {
-            MaterialTheme {
+            MeowmosTheme(dynamicColor = false) {
                 var destination by remember { mutableStateOf<MemoSpace?>(null) }
                 LaunchedEffect(Unit) { destination = preference.await() }
                 MemoInputTopBar(
@@ -116,11 +127,35 @@ class UiComponentsTest {
         compose.runOnIdle { assertEquals(listOf("spaces/family"), publishedTo) }
     }
 
+    @Test fun commentAudienceLabelOpensTheDropdownAndTracksSelection() {
+        compose.setContent {
+            MeowmosTheme(dynamicColor = false) {
+                var visibility by remember { mutableStateOf(MemoVisibility.PRIVATE) }
+                var expanded by remember { mutableStateOf(false) }
+                MemoVisibilityPicker(
+                    currentVisibility = visibility,
+                    showSpaceVisibility = false,
+                    expanded = expanded,
+                    onExpandedChange = { expanded = it },
+                    onVisibilitySelected = { visibility = it },
+                    showLabel = true,
+                )
+            }
+        }
+        val privateLabel = context.getString(MemoVisibility.PRIVATE.titleResource)
+        val publicLabel = context.getString(MemoVisibility.PUBLIC.titleResource)
+        compose.onNodeWithText(privateLabel).performClick()
+        compose.onNodeWithText(context.getString(MemoVisibility.SPACE.titleResource)).assertDoesNotExist()
+        compose.onNodeWithText(publicLabel).performClick()
+        compose.onNodeWithContentDescription(publicLabel).assertIsDisplayed().performClick()
+        compose.onNodeWithText(privateLabel).assertIsDisplayed()
+    }
+
     @Test fun bottomNavigationSwitchesDestinationsAndRespectsDestinationList() {
         var selected by mutableStateOf(RouteName.MEMOS)
         val localDestinations = MeowmosDestination.entries.filterNot { it == MeowmosDestination.EXPLORE }
         compose.setContent {
-            MaterialTheme {
+            MeowmosTheme(dynamicColor = false) {
                 MemosNavigationScaffold(
                     useRail = false,
                     destinations = localDestinations,
@@ -149,11 +184,45 @@ class UiComponentsTest {
         )
     }
 
+    @Test fun returningToATabRestoresItsPreviousSelection() {
+        compose.setContent {
+            MeowmosTheme(dynamicColor = false) {
+                val navController = rememberNavController()
+                val entry by navController.currentBackStackEntryAsState()
+                MemosNavigationScaffold(
+                    useRail = false,
+                    destinations = listOf(MeowmosDestination.MEMOS, MeowmosDestination.RESOURCES),
+                    selectedRoute = entry?.destination?.route ?: RouteName.MEMOS,
+                    onSelectDestination = { navController.navigateToMemoTab(it.route) },
+                    onCompose = {},
+                ) {
+                    NavHost(navController, startDestination = RouteName.MEMOS) {
+                        composable(RouteName.MEMOS) { Text("Memo feed") }
+                        composable(RouteName.RESOURCE) {
+                            var showImages by rememberSaveable { mutableStateOf(true) }
+                            Button(onClick = { showImages = !showImages }) {
+                                Text(if (showImages) "Images" else "Other files")
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        val resources = compose.onNodeWithText(context.getString(R.string.resources))
+        resources.performClick()
+        compose.onNodeWithText("Images").performClick()
+        compose.onNodeWithText("Other files").assertIsDisplayed()
+        compose.onNodeWithText(context.getString(R.string.memos)).performClick()
+        compose.onNodeWithText("Memo feed").assertIsDisplayed()
+        resources.performClick()
+        compose.onNodeWithText("Other files").assertIsDisplayed()
+    }
+
     @Test fun settingRowExposesOneSwitchAndTogglesFromItsLabel() {
         compose.setContent {
             MaterialTheme {
                 var checked by remember { mutableStateOf(false) }
-                SettingSwitchItem(Icons.Outlined.Save, "Autosave", checked = checked) { checked = it }
+                SettingSwitchItem(ImageVector.vectorResource(R.drawable.symbol_save), "Autosave", checked = checked) { checked = it }
             }
         }
         compose.onAllNodesWithText("Autosave").assertCountEquals(1)
@@ -164,7 +233,7 @@ class UiComponentsTest {
     @Test fun disabledSettingCannotBeToggled() {
         compose.setContent {
             MaterialTheme {
-                SettingSwitchItem(Icons.Outlined.Save, "Autosave", checked = false, enabled = false) {
+                SettingSwitchItem(ImageVector.vectorResource(R.drawable.symbol_save), "Autosave", checked = false, enabled = false) {
                     error("A disabled setting must not be changed")
                 }
             }
@@ -172,17 +241,55 @@ class UiComponentsTest {
         compose.onNodeWithText("Autosave").assertIsNotEnabled().assertIsOff()
     }
 
-    @Test fun iconOnlyActionHasAnAccessibleLabel() {
-        var clicks = 0
+    @Test fun overflowMenuClosesOnBackAndAfterSelectingAnAction() {
+        var copies = 0
+        var deletes = 0
         compose.setContent {
-            MaterialTheme {
-                ActionIconButton("More options", onClick = { clicks++ }) {
-                    Icon(Icons.Default.MoreVert, contentDescription = null)
+            MeowmosTheme(dynamicColor = false) {
+                MemoOverflowMenu(onDelete = { deletes++ }) {
+                    listOf(MemoMenuAction(R.string.copy, R.drawable.symbol_content_copy) { copies++ })
                 }
             }
         }
-        compose.onNodeWithContentDescription("More options").performClick()
-        compose.runOnIdle { assertEquals(1, clicks) }
+
+        val trigger = compose.onNodeWithContentDescription(context.getString(R.string.more_options))
+        val copy = compose.onNodeWithText(context.getString(R.string.copy))
+        val delete = compose.onNodeWithText(context.getString(R.string.delete))
+        trigger.performClick()
+        copy.assertIsDisplayed()
+        delete.assertIsDisplayed()
+        Espresso.pressBack()
+        copy.assertDoesNotExist()
+        compose.runOnIdle { assertEquals(0, copies + deletes) }
+
+        trigger.performClick()
+        copy.performClick()
+        copy.assertDoesNotExist()
+        trigger.performClick()
+        delete.performClick()
+        delete.assertDoesNotExist()
+        compose.runOnIdle {
+            assertEquals(1, copies)
+            assertEquals(1, deletes)
+        }
+    }
+
+    @Test fun syncingKeepsTheSearchTargetInPlaceAndDisablesSync() {
+        var syncing by mutableStateOf(false)
+        compose.setContent {
+            MeowmosTheme(dynamicColor = false) {
+                Row {
+                    SyncStatusBadge(syncing = syncing, unsyncedCount = 3, onSync = { syncing = true })
+                    Button(onClick = {}) { Text("Search target") }
+                }
+            }
+        }
+        val search = compose.onNodeWithText("Search target")
+        val restingBounds = search.fetchSemanticsNode().boundsInRoot
+        val sync = compose.onNodeWithContentDescription(context.getString(R.string.sync_status_sync_now))
+        sync.performClick()
+        sync.assertIsNotEnabled()
+        assertEquals(restingBounds, search.fetchSemanticsNode().boundsInRoot)
     }
 
     @Test fun searchRestoresItsQueryAndClearActionRemovesIt() {
@@ -250,7 +357,7 @@ class UiComponentsTest {
     @Test fun selectionSurvivesChangingBetweenOneAndTwoPanes() {
         var wide by mutableStateOf(true)
         compose.setContent {
-            MaterialTheme {
+            MeowmosTheme(dynamicColor = false) {
                 CompositionLocalProvider(LocalDensity provides Density(if (wide) 0.5f else 4f)) {
                     MemosNavigationScaffold(
                         useRail = wide,

@@ -2,9 +2,6 @@ package io.github.slopcommunistcooperative.meowmos.ui.page.memos
 
 import android.net.Uri
 import androidx.compose.foundation.layout.Row
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.outlined.Tag
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -15,8 +12,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavHostController
 import io.github.slopcommunistcooperative.meowmos.R
@@ -60,7 +59,7 @@ private fun TagMemoPageContent(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         WayfindingBadge(
                             text = normalizedCurrentTag,
-                            icon = Icons.Outlined.Tag,
+                            icon = ImageVector.vectorResource(R.drawable.symbol_tag),
                             tone = WayfindingTone.Signal,
                         )
                     }
@@ -73,7 +72,7 @@ private fun TagMemoPageContent(
                         },
                     ) {
                         Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            imageVector = ImageVector.vectorResource(R.drawable.symbol_arrow_back),
                             contentDescription = stringResource(R.string.back),
                         )
                     }

@@ -7,16 +7,16 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import io.github.slopcommunistcooperative.meowmos.R
@@ -48,7 +48,7 @@ fun MemoLocationRow(location: MemoLocation, modifier: Modifier = Modifier, onCli
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        Icon(Icons.Outlined.LocationOn, contentDescription = stringResource(R.string.memo_location), tint = MaterialTheme.colorScheme.primary)
+        Icon(ImageVector.vectorResource(R.drawable.symbol_location_on), contentDescription = stringResource(R.string.memo_location), tint = MaterialTheme.colorScheme.primary)
         Text(location.displayText, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary)
     }
 }

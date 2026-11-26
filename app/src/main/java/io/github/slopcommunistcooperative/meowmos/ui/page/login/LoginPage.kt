@@ -12,13 +12,6 @@ import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.outlined.Login
-import androidx.compose.material.icons.outlined.Badge
-import androidx.compose.material.icons.outlined.Computer
-import androidx.compose.material.icons.outlined.Lock
-import androidx.compose.material.icons.outlined.PermIdentity
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.BottomAppBarDefaults
@@ -47,8 +40,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusEvent
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
@@ -196,7 +191,7 @@ fun LoginPage(
                             navController.popBackStackIfLifecycleIsResumed(lifecycleOwner)
                         }) {
                             Icon(
-                                Icons.AutoMirrored.Filled.ArrowBack,
+                                ImageVector.vectorResource(R.drawable.symbol_arrow_back),
                                 contentDescription = R.string.back.string
                             )
                         }
@@ -222,7 +217,7 @@ fun LoginPage(
                         text = { Text(R.string.add_account.string) },
                         icon = {
                             Icon(
-                                Icons.AutoMirrored.Outlined.Login,
+                                ImageVector.vectorResource(R.drawable.symbol_login),
                                 contentDescription = R.string.add_account.string
                             )
                         }
@@ -266,7 +261,7 @@ fun LoginPage(
                     singleLine = true,
                     leadingIcon = {
                         Icon(
-                            imageVector = Icons.Outlined.Badge,
+                            imageVector = ImageVector.vectorResource(R.drawable.symbol_badge),
                             contentDescription = R.string.account_name.string
                         )
                     },
@@ -297,7 +292,7 @@ fun LoginPage(
                     singleLine = true,
                     leadingIcon = {
                         Icon(
-                            imageVector = Icons.Outlined.Computer,
+                            imageVector = ImageVector.vectorResource(R.drawable.symbol_computer),
                             contentDescription = R.string.address.string
                         )
                     },
@@ -329,7 +324,7 @@ fun LoginPage(
                     visualTransformation = PasswordVisualTransformation(),
                     leadingIcon = {
                         Icon(
-                            imageVector = Icons.Outlined.PermIdentity,
+                            imageVector = ImageVector.vectorResource(R.drawable.symbol_person),
                             contentDescription = R.string.access_token.string
                         )
                     },
@@ -377,7 +372,7 @@ fun LoginPage(
                         }
                     ) {
                         Icon(
-                            imageVector = Icons.Outlined.Lock,
+                            imageVector = ImageVector.vectorResource(R.drawable.symbol_lock),
                             contentDescription = null
                         )
 

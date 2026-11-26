@@ -1,20 +1,21 @@
 package io.github.slopcommunistcooperative.meowmos.ext
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Group
-import androidx.compose.material.icons.outlined.House
-import androidx.compose.material.icons.outlined.Lock
-import androidx.compose.material.icons.outlined.Public
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import io.github.slopcommunistcooperative.meowmos.R
 import io.github.slopcommunistcooperative.meowmos.data.model.MemoVisibility
 
-val MemoVisibility.icon: ImageVector get() = when (this) {
-    MemoVisibility.PRIVATE -> Icons.Outlined.Lock
-    MemoVisibility.PROTECTED -> Icons.Outlined.House
-    MemoVisibility.PUBLIC -> Icons.Outlined.Public
-    MemoVisibility.SPACE -> Icons.Outlined.Group
-}
+val MemoVisibility.icon: ImageVector
+    @Composable
+    get() = ImageVector.vectorResource(
+        when (this) {
+            MemoVisibility.PRIVATE -> R.drawable.symbol_lock
+            MemoVisibility.PROTECTED -> R.drawable.symbol_house
+            MemoVisibility.PUBLIC -> R.drawable.symbol_public
+            MemoVisibility.SPACE -> R.drawable.symbol_group
+        },
+    )
 
 val MemoVisibility.titleResource: Int get() = when (this) {
     MemoVisibility.PRIVATE -> R.string.memo_visibility_private

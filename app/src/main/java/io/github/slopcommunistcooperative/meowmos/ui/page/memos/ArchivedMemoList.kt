@@ -4,13 +4,13 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Inventory2
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.vectorResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import io.github.slopcommunistcooperative.meowmos.ui.util.edgeToEdgeContentPadding
 import io.github.slopcommunistcooperative.meowmos.R
@@ -34,7 +34,7 @@ fun ArchivedMemoList(
             if (viewModel.memos.isEmpty()) {
                 item(key = "empty") {
                     MeowmosEmptyState(
-                        icon = Icons.Outlined.Inventory2,
+                        icon = ImageVector.vectorResource(R.drawable.symbol_inventory_2),
                         title = stringResource(R.string.no_archived_memos),
                     )
                 }

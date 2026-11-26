@@ -40,7 +40,7 @@ import io.github.slopcommunistcooperative.meowmos.viewmodel.LocalMemos
 import io.github.slopcommunistcooperative.meowmos.viewmodel.LocalUserState
 
 @Composable
-fun Navigation() {
+fun Navigation(dynamicColor: Boolean) {
     val navController = rememberNavController()
     val userStateViewModel = LocalUserState.current
     val memosViewModel = LocalMemos.current
@@ -64,7 +64,7 @@ fun Navigation() {
     var shareContent by remember { mutableStateOf<ShareContent?>(null) }
 
     CompositionLocalProvider(LocalRootNavController provides navController) {
-        MeowmosTheme {
+        MeowmosTheme(dynamicColor = dynamicColor) {
             MemosNavHost(
                 navController = navController,
                 startDestination = RouteName.MEMOS,

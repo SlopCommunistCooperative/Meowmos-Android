@@ -185,9 +185,10 @@ class MeowmosGlanceWidget : GlanceAppWidget() {
                     contentAlignment = Alignment.Center
                 ) {
                     Image(
-                        provider = ImageProvider(R.drawable.ic_shortcut_refresh),
+                        provider = ImageProvider(R.drawable.symbol_refresh),
                         contentDescription = context.getString(R.string.refresh),
-                        modifier = GlanceModifier.size(24.dp)
+                        modifier = GlanceModifier.size(24.dp),
+                        colorFilter = ColorFilter.tint(GlanceTheme.colors.primary),
                     )
                 }
                 Spacer(modifier = GlanceModifier.width(8.dp))
@@ -200,9 +201,10 @@ class MeowmosGlanceWidget : GlanceAppWidget() {
                     contentAlignment = Alignment.Center
                 ) {
                     Image(
-                        provider = ImageProvider(R.drawable.ic_shortcut_add),
+                        provider = ImageProvider(R.drawable.symbol_add),
                         contentDescription = context.getString(R.string.edit),
-                        modifier = GlanceModifier.size(24.dp)
+                        modifier = GlanceModifier.size(24.dp),
+                        colorFilter = ColorFilter.tint(GlanceTheme.colors.primary),
                     )
                 }
             }
@@ -305,9 +307,10 @@ class MeowmosGlanceWidget : GlanceAppWidget() {
                     if (memo.visibility != MemoVisibility.PUBLIC){
                         Spacer(modifier = GlanceModifier.width(4.dp))
                         Image(
-                            provider = ImageProvider(android.R.drawable.ic_lock_lock),
+                            provider = ImageProvider(R.drawable.symbol_lock),
                             contentDescription = context.getString(R.string.widget_private),
-                            modifier = GlanceModifier.size(14.dp)
+                            modifier = GlanceModifier.size(14.dp),
+                            colorFilter = ColorFilter.tint(GlanceTheme.colors.onSurfaceVariant),
                         )
                     }
                     
@@ -315,7 +318,7 @@ class MeowmosGlanceWidget : GlanceAppWidget() {
                     if (memo.pinned) {
                         Spacer(modifier = GlanceModifier.width(4.dp))
                         Image(
-                            provider = ImageProvider(R.drawable.ic_pin),
+                            provider = ImageProvider(R.drawable.symbol_push_pin),
                             contentDescription = context.getString(R.string.widget_pinned),
                             modifier = GlanceModifier.size(14.dp),
                             colorFilter = ColorFilter.tint(GlanceTheme.colors.onSurfaceVariant)

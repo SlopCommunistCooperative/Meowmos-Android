@@ -105,6 +105,9 @@ interface MemoDao {
     @Query("SELECT * FROM resources WHERE accountKey = :accountKey ORDER BY date DESC")
     suspend fun getAllResources(accountKey: String): List<ResourceEntity>
 
+    @Query("SELECT * FROM resources WHERE accountKey = :accountKey ORDER BY date DESC")
+    fun observeResources(accountKey: String): Flow<List<ResourceEntity>>
+
     @Query("SELECT * FROM resources WHERE identifier = :identifier AND accountKey = :accountKey")
     suspend fun getResourceById(identifier: String, accountKey: String): ResourceEntity?
 

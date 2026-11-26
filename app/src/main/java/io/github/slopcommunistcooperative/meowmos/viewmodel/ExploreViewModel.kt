@@ -8,6 +8,7 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import io.github.slopcommunistcooperative.meowmos.data.datasource.EXPLORE_PAGE_SIZE
@@ -23,6 +24,7 @@ class ExploreViewModel @Inject constructor(
     accountService: AccountService
 ) : ViewModel() {
     val exploreMemos = accountService.currentAccount
+        .distinctUntilChangedBy { it?.accountKey() to it?.getAccountInfo()?.accessToken }
         .flatMapLatest { account ->
             if (account == null || account is Account.Local) {
                 return@flatMapLatest flowOf(PagingData.empty<Memo>())

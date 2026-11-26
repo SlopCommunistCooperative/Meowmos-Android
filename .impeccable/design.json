@@ -38,8 +38,9 @@
       { "name": "fab-rest", "value": "0 2px 6px rgba(20,21,19,0.16)", "purpose": "Compact-width Extended FAB resting elevation." }
     ],
     "motion": [
-      { "name": "m3-standard-motion", "value": "Material 3 1.4.0 MaterialTheme motion tokens", "purpose": "Spatial and effects transitions for M3 1.4.0 components." },
-      { "name": "tab-fade-through", "value": "180ms fadeIn / 140ms fadeOut", "purpose": "Top-level bottom bar and navigation rail switching." }
+      { "name": "m3-expressive-motion", "value": "Material 3 1.5.0 MaterialExpressiveTheme motion tokens", "purpose": "Spring-based spatial and effects transitions." },
+      { "name": "tab-fade", "value": "220ms enter / 110ms exit", "purpose": "Fade tab content without moving the navigation bar or rail." },
+      { "name": "memo-loading-pulse", "value": "900ms each direction", "purpose": "Pulse the placeholder lines while the empty feed loads." }
     ],
     "breakpoints": [
       { "name": "compact", "value": "< 600dp (ShortNavigationBar)" },

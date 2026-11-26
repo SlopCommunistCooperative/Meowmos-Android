@@ -2,7 +2,7 @@ package io.github.slopcommunistcooperative.meowmos.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// Terminal Yellow Wayfinding static palette (fallback when Material You dynamic color is off or < Android 12).
+// Terminal Yellow Wayfinding static palette, used when Material You dynamic color is off.
 // Signal yellow (#F4CC00) is reserved strictly for wayfinding signals: active navigation indicators,
 // primary FAB, pinned markers, and space destination badges.
 val TerminalSignalYellow = Color(0xFFF4CC00)

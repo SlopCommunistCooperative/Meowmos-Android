@@ -17,6 +17,7 @@ import javax.inject.Singleton
 class MemoService @Inject constructor(
     private val accountService: AccountService,
 ) {
+    private var lastSyncedRepository: AbstractMemoRepository? = null
     private var lastSyncTime = 0L
     private val syncThreshold = 5000L
     private val syncMutex = Mutex()
@@ -35,14 +36,15 @@ class MemoService @Inject constructor(
 
     suspend fun sync(force: Boolean): ApiResponse<Unit> {
         return syncMutex.withLock {
+            val repo = getRepository()
             val now = System.currentTimeMillis()
-            if (!force && (now - lastSyncTime) <= syncThreshold) {
+            if (!force && repo === lastSyncedRepository && (now - lastSyncTime) <= syncThreshold) {
                 return@withLock ApiResponse.Success(Unit)
             }
 
-            val repo = getRepository()
             val result = repo.sync()
             if (result is ApiResponse.Success) {
+                lastSyncedRepository = repo
                 lastSyncTime = now
             }
             result

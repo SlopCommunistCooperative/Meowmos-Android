@@ -7,24 +7,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.outlined.Archive
-import androidx.compose.material.icons.outlined.BugReport
-import androidx.compose.material.icons.outlined.Check
-import androidx.compose.material.icons.outlined.Edit
-import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.Language
-import androidx.compose.material.icons.outlined.Lock
-import androidx.compose.material.icons.outlined.PersonAdd
-import androidx.compose.material.icons.outlined.Save
-import androidx.compose.material.icons.outlined.Source
-import androidx.compose.material.icons.outlined.Web
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import io.github.slopcommunistcooperative.meowmos.ui.component.ActionIconButton
 import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
@@ -192,7 +181,7 @@ fun SettingsPage(
                         navController.popBackStackIfLifecycleIsResumed(lifecycleOwner)
                     }) {
                         Icon(
-                            Icons.AutoMirrored.Filled.ArrowBack,
+                            ImageVector.vectorResource(R.drawable.symbol_arrow_back),
                             contentDescription = R.string.back.string
                         )
                     }
@@ -224,7 +213,7 @@ fun SettingsPage(
                                 trailingIcon = {
                                     if (currentAccount?.accountKey() == account.accountKey()) {
                                         Icon(
-                                            Icons.Outlined.Check,
+                                            ImageVector.vectorResource(R.drawable.symbol_check),
                                             contentDescription = R.string.account_selected.string,
                                             modifier = Modifier.padding(start = 16.dp),
                                             tint = MaterialTheme.colorScheme.primary,
@@ -242,7 +231,7 @@ fun SettingsPage(
                                 trailingIcon = {
                                     if (currentAccount?.accountKey() == account.accountKey()) {
                                         Icon(
-                                            Icons.Outlined.Check,
+                                            ImageVector.vectorResource(R.drawable.symbol_check),
                                             contentDescription = R.string.account_selected.string,
                                             modifier = Modifier.padding(start = 16.dp),
                                             tint = MaterialTheme.colorScheme.primary,
@@ -254,12 +243,12 @@ fun SettingsPage(
                             }
 
                             is Account.Local -> SettingItem(
-                                icon = Icons.Outlined.Home,
+                                icon = ImageVector.vectorResource(R.drawable.symbol_home),
                                 text = R.string.local_account.string,
                                 trailingIcon = {
                                     if (currentAccount?.accountKey() == account.accountKey()) {
                                         Icon(
-                                            Icons.Outlined.Check,
+                                            ImageVector.vectorResource(R.drawable.symbol_check),
                                             contentDescription = R.string.account_selected.string,
                                             modifier = Modifier.padding(start = 16.dp),
                                             tint = MaterialTheme.colorScheme.primary,
@@ -272,7 +261,7 @@ fun SettingsPage(
                         }
                     }
                     if (accounts.isNotEmpty()) SettingsGroupDivider()
-                    SettingItem(icon = Icons.Outlined.PersonAdd, text = R.string.add_account.string) {
+                    SettingItem(icon = ImageVector.vectorResource(R.drawable.symbol_person_add), text = R.string.add_account.string) {
                         navController.navigate(RouteName.ADD_ACCOUNT)
                     }
                 }
@@ -284,8 +273,20 @@ fun SettingsPage(
                     modifier = Modifier.padding(top = 12.dp),
                 )
                 SettingsGroupCard {
+                    SettingSwitchItem(
+                        icon = ImageVector.vectorResource(R.drawable.symbol_palette),
+                        text = R.string.dynamic_color.string,
+                        subtitle = R.string.dynamic_color_summary.string,
+                        checked = settings.dynamicColorEnabled,
+                        onCheckedChange = { enabled ->
+                            scope.launch {
+                                context.settingsDataStore.updateData { it.copy(dynamicColorEnabled = enabled) }
+                            }
+                        },
+                    )
+                    SettingsGroupDivider()
                     SettingItem(
-                        icon = Icons.Outlined.Language,
+                        icon = ImageVector.vectorResource(R.drawable.symbol_language),
                         text = R.string.language.string,
                         trailingIcon = {
                             Text(
@@ -300,7 +301,7 @@ fun SettingsPage(
                     }
                     SettingsGroupDivider()
                     SettingItem(
-                        icon = Icons.Outlined.Edit,
+                        icon = ImageVector.vectorResource(R.drawable.symbol_edit),
                         text = R.string.edit_gesture.string,
                         trailingIcon = {
                             Text(
@@ -314,7 +315,7 @@ fun SettingsPage(
                     }
                     SettingsGroupDivider()
                     SettingSwitchItem(
-                        icon = Icons.Outlined.Save,
+                        icon = ImageVector.vectorResource(R.drawable.symbol_save),
                         text = R.string.autosave.string,
                         subtitle = R.string.autosave_summary.string,
                         checked = autosaveEnabled,
@@ -322,7 +323,7 @@ fun SettingsPage(
                     )
                     SettingsGroupDivider()
                     SettingSwitchItem(
-                        icon = Icons.Outlined.Archive,
+                        icon = ImageVector.vectorResource(R.drawable.symbol_archive),
                         text = R.string.search_include_archived.string,
                         subtitle = R.string.search_include_archived_summary.string,
                         checked = searchIncludesArchived,
@@ -339,7 +340,7 @@ fun SettingsPage(
                 SettingsGroupCard {
                     val appLockToggleEnabled = appLockSupported || settings.appLockEnabled
                     SettingSwitchItem(
-                        icon = Icons.Outlined.Lock,
+                        icon = ImageVector.vectorResource(R.drawable.symbol_lock),
                         text = R.string.app_lock.string,
                         subtitle = if (appLockSupported) {
                             R.string.app_lock_summary.string
@@ -352,7 +353,7 @@ fun SettingsPage(
                     )
                     SettingsGroupDivider()
                     SettingItem(
-                        icon = Icons.Outlined.Lock,
+                        icon = ImageVector.vectorResource(R.drawable.symbol_lock),
                         text = R.string.client_certificate.string,
                         subtitle = if (hasClientCertificate) {
                             R.string.client_certificate_selected.string
@@ -365,7 +366,7 @@ fun SettingsPage(
                     if (hasClientCertificate) {
                         SettingsGroupDivider()
                         SettingItem(
-                            icon = Icons.Outlined.Lock,
+                            icon = ImageVector.vectorResource(R.drawable.symbol_lock),
                             text = R.string.remove_client_certificate.string,
                             subtitle = R.string.remove_client_certificate_message.string,
                         ) {
@@ -381,20 +382,20 @@ fun SettingsPage(
                     modifier = Modifier.padding(top = 12.dp),
                 )
                 SettingsGroupCard {
-                    SettingItem(icon = Icons.Outlined.Web, text = R.string.website.string) {
+                    SettingItem(icon = ImageVector.vectorResource(R.drawable.symbol_web), text = R.string.website.string) {
                         uriHandler.openUri("https://github.com/SlopCommunistCooperative/Meowmos-Android")
                     }
                     SettingsGroupDivider()
-                    SettingItem(icon = Icons.Outlined.Lock, text = R.string.privacy_policy.string) {
+                    SettingItem(icon = ImageVector.vectorResource(R.drawable.symbol_lock), text = R.string.privacy_policy.string) {
                         uriHandler.openUri("https://memos.moe/privacy")
                     }
                     SettingsGroupDivider()
-                    SettingItem(icon = Icons.Outlined.Source, text = R.string.acknowledgements.string) {
+                    SettingItem(icon = ImageVector.vectorResource(R.drawable.symbol_code), text = R.string.acknowledgements.string) {
                         uriHandler.openUri("https://memos.moe/android-acknowledgements")
                     }
                     SettingsGroupDivider()
                     SettingItem(
-                        icon = Icons.Outlined.BugReport,
+                        icon = ImageVector.vectorResource(R.drawable.symbol_bug_report),
                         text = R.string.report_an_issue.string,
                     ) {
                         uriHandler.openUri("https://github.com/SlopCommunistCooperative/Meowmos-Android/issues")

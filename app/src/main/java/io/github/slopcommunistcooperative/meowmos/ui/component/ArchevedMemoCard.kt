@@ -1,29 +1,17 @@
 package io.github.slopcommunistcooperative.meowmos.ui.component
 
 import android.text.format.DateUtils
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.outlined.Delete
-import androidx.compose.material.icons.outlined.Restore
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.ui.res.stringResource
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -78,52 +66,19 @@ fun ArchivedMemoCard(
 fun ArchivedMemosCardActionButton(
     memo: MemoEntity
 ) {
-    var menuExpanded by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     val archivedMemoListViewModel = LocalArchivedMemos.current
     val memosViewModel = LocalMemos.current
     var showDeleteDialog by remember { mutableStateOf(false) }
 
-    Box(modifier = Modifier
-        .fillMaxSize()
-        .wrapContentSize(Alignment.TopEnd)) {
-        ActionIconButton(label = stringResource(R.string.more_options), onClick = { menuExpanded = true }) {
-            Icon(Icons.Filled.MoreVert, contentDescription = null)
-        }
-        DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
-            DropdownMenuItem(
-                text = { Text(R.string.restore.string) },
-                onClick = {
-                    scope.launch {
-                        archivedMemoListViewModel.restoreMemo(memo.identifier).suspendOnSuccess {
-                            menuExpanded = false
-                            memosViewModel.loadMemos()
-                        }
-                    }
-                },
-                leadingIcon = {
-                    Icon(
-                        Icons.Outlined.Restore,
-                        contentDescription = null
-                    )
-                })
-            DropdownMenuItem(
-                text = { Text(R.string.delete.string) },
-                onClick = {
-                    showDeleteDialog = true
-                    menuExpanded = false
-                },
-                colors = MenuDefaults.itemColors(
-                    textColor = MaterialTheme.colorScheme.error,
-                    leadingIconColor = MaterialTheme.colorScheme.error,
-                ),
-                leadingIcon = {
-                    Icon(
-                        Icons.Outlined.Delete,
-                        contentDescription = null
-                    )
-                })
-        }
+    MemoOverflowMenu(onDelete = { showDeleteDialog = true }) {
+        listOf(MemoMenuAction(R.string.restore, R.drawable.symbol_unarchive) {
+            scope.launch {
+                archivedMemoListViewModel.restoreMemo(memo.identifier).suspendOnSuccess {
+                    memosViewModel.loadMemos()
+                }
+            }
+        })
     }
 
     if (showDeleteDialog) {

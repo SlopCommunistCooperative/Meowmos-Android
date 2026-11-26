@@ -85,6 +85,8 @@
     <string name="view_more">查看更多</string>
     <string name="accounts">帳戶</string>
     <string name="preferences">偏好設定</string>
+    <string name="dynamic_color">Material You 動態配色</string>
+    <string name="dynamic_color_summary">使用系統配色</string>
     <string name="edit_gesture">編輯手勢</string>
     <string name="edit_gesture_none">無</string>
     <string name="edit_gesture_single">單擊</string>

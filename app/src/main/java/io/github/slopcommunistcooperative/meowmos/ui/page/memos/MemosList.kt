@@ -3,6 +3,7 @@ package io.github.slopcommunistcooperative.meowmos.ui.page.memos
 import android.net.Uri
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,25 +13,26 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.StickyNote2
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.res.vectorResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
@@ -57,7 +59,7 @@ import io.github.slopcommunistcooperative.meowmos.viewmodel.LocalUserState
 import io.github.slopcommunistcooperative.meowmos.viewmodel.ManualSyncResult
 import timber.log.Timber
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun MemosList(
     contentPadding: PaddingValues,
@@ -70,6 +72,8 @@ fun MemosList(
     onMemoClick: ((String) -> Unit)? = null,
     archivedResults: List<MemoEntity> = emptyList(),
     showComments: Boolean = false,
+    showInitialPlaceholder: Boolean = false,
+    refreshEnabled: Boolean = true,
     headerContent: (LazyListScope.() -> Unit)? = null,
 ) {
     val context = LocalContext.current
@@ -85,12 +89,13 @@ fun MemosList(
     val refreshState = rememberPullToRefreshState()
     val scope = rememberCoroutineScope()
     var isRefreshing by remember { mutableStateOf(false) }
-    var commentRefresh by remember { mutableIntStateOf(0) }
     var syncAlert by remember { mutableStateOf<PullRefreshSyncAlert?>(null) }
-    val filteredMemos = remember(viewModel.memos.toList(), tag, searchString) {
-        val pinned = viewModel.memos.filter { it.pinned }
-        val nonPinned = viewModel.memos.filter { !it.pinned }
-        var fullList = pinned + nonPinned
+    val accountKey = currentAccount?.accountKey()
+    val filteredMemos = remember(viewModel.memos.toList(), accountKey, tag, searchString) {
+        val (pinned, unpinned) = viewModel.memos.asSequence()
+            .filter { it.accountKey == accountKey }
+            .partition { it.pinned }
+        var fullList = pinned + unpinned
 
         tag?.let { tag ->
             fullList = fullList.filter { memo ->
@@ -119,6 +124,7 @@ fun MemosList(
     PullToRefreshBox(
         isRefreshing = isRefreshing,
         onRefresh = {
+            if (!refreshEnabled || isRefreshing) return@PullToRefreshBox
             isRefreshing = true
             scope.launch {
                 if (onRefresh != null) {
@@ -137,11 +143,18 @@ fun MemosList(
                         }
                     }
                 }
-                if (showComments) commentRefresh++
                 isRefreshing = false
             }
         },
         state = refreshState,
+        enabled = refreshEnabled,
+        indicator = {
+            PullToRefreshDefaults.LoadingIndicator(
+                state = refreshState,
+                isRefreshing = isRefreshing,
+                modifier = Modifier.align(Alignment.TopCenter).padding(top = contentPadding.calculateTopPadding()),
+            )
+        },
         modifier = if (showComments) Modifier.fillMaxSize().imePadding() else Modifier.fillMaxSize()
     ) {
         LazyColumn(
@@ -152,10 +165,12 @@ fun MemosList(
             contentPadding = listContentPadding
         ) {
             headerContent?.invoke(this)
-            if (filteredMemos.isEmpty() && archivedResults.isEmpty()) {
+            if (showInitialPlaceholder && filteredMemos.isEmpty()) {
+                item(key = "loading") { MemoFeedPlaceholder() }
+            } else if (filteredMemos.isEmpty() && archivedResults.isEmpty()) {
                 item(key = "empty") {
                     MeowmosEmptyState(
-                        icon = Icons.AutoMirrored.Outlined.StickyNote2,
+                        icon = ImageVector.vectorResource(R.drawable.symbol_sticky_note_2),
                         title = stringResource(R.string.no_memos),
                     )
                 }
@@ -177,7 +192,7 @@ fun MemosList(
                     onTagClick = onTagClick,
                     footer = {
                         if (showComments) MemoComments(
-                            memo, memo.accountKey, memo.space, onViewAll = openMemo, refresh = commentRefresh,
+                            memo, memo.accountKey, memo.space, onViewAll = openMemo,
                         )
                     },
                 )
@@ -199,10 +214,6 @@ fun MemosList(
         viewModel.errorMessage?.let {
             Timber.d(it)
         }
-    }
-
-    LaunchedEffect(Unit) {
-        viewModel.loadMemos()
     }
 
     LaunchedEffect(filteredMemos.firstOrNull()?.identifier) {

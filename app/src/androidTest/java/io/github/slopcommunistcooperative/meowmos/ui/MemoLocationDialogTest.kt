@@ -12,7 +12,6 @@ import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.test.platform.app.InstrumentationRegistry
-import androidx.test.filters.SdkSuppress
 import io.github.slopcommunistcooperative.meowmos.R
 import io.github.slopcommunistcooperative.meowmos.data.model.MemoLocation
 import io.github.slopcommunistcooperative.meowmos.ui.page.memoinput.MemoLocationDialog
@@ -32,7 +31,7 @@ class MemoLocationDialogTest {
         }
     }
 
-    @Test @SdkSuppress(minSdkVersion = 31)
+    @Test
     fun currentLocationUsesTheAndroidProvider() {
         val automation = InstrumentationRegistry.getInstrumentation().uiAutomation
         val enabled = context.getSystemService(LocationManager::class.java).isLocationEnabled

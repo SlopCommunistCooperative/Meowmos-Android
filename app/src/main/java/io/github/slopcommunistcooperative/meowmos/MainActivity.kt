@@ -54,8 +54,8 @@ class MainActivity : FragmentActivity() {
                 LocalUserState provides userStateViewModel,
                 LocalMemos provides memosViewModel
             ) {
-                AppLockGate {
-                    Navigation()
+                AppLockGate { dynamicColor ->
+                    Navigation(dynamicColor = dynamicColor)
                 }
             }
         }

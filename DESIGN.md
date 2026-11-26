@@ -120,13 +120,13 @@ components:
 
 ## Overview
 
-Meowmos uses **Terminal Yellow Wayfinding** implemented on **Jetpack Compose Material 3 Expressive (`1.4.0`)**. The system is designed for Operate-mode clarity: families and small groups should know in a glance where a note belongs (which shared space, whether it is pinned, who wrote it, and whether it is synced) and reach every core destination by thumb.
+Meowmos uses the Terminal Yellow Wayfinding palette and Jetpack Compose Material 3 Expressive (`1.5.0`). Memo cards show each note's space, author, pin, and sync status where applicable.
 
 The navigation drawer is retired in favor of an adaptive Material 3 navigation shell: a compact `ShortNavigationBar` with 4 destinations (`Memos`, `Explore`, `Resources`, `Me`; 3 for local accounts where `Explore` is hidden) on phone widths, transitioning seamlessly into a persistent `NavigationRail` at medium and expanded widths (`>= 600dp`) alongside the two-pane `MemoListDetailLayout` (`>= 840dp`). All tags live directly inside `SearchPage` for immediate discovery and filtering.
 
 ## Colors
 
-Meowmos supports **Android 12+ Material You dynamic color** as a first-class option (`MeowmosTheme(dynamicColor = true)`). When dynamic color is disabled or unavailable, the static Terminal Yellow Wayfinding scheme applies:
+Meowmos uses Material You colors by default. To use the Terminal Yellow Wayfinding palette, open Preferences in Settings and turn off **Material You colors**. Meowmos still follows the system light or dark mode.
 
 - **Signal Yellow (`#F4CC00`) + Signal Ink (`#181500`)**: Reserved strictly for wayfinding beacons—the active navigation indicator pill, primary compose FAB, pinned note badge, and active posting-space selector. Contrast exceeds 11:1.
 - **Tonal Plaster & Charcoal Surfaces**: Light mode pairs a warm plaster canvas (`#F5F5F0`) with crisp white cards (`#FFFFFF`) and `1dp` subtle borders (`#C9CAC0`). Dark mode flips to departure-hall charcoal (`#111210`) with elevated charcoal cards (`#181916`) and glowing signal beacons.
@@ -140,6 +140,10 @@ Built on the Android system humanist sans-serif family (`FontFamily.SansSerif`, 
 
 - **Tabular numerals (`fontFeatureSettings = "tnum"`)** are enabled on `displaySmall`, `headline*`, and `label*` roles so timestamps, counts, and the 3-column metrics board on `MePage` align cleanly without jitter.
 - **Reading comfort**: `bodyLarge` (`16sp / 24sp`) governs memo Markdown prose; `titleLarge` (`20sp` SemiBold) anchors top app bars; `labelSmall` (`11sp` SemiBold) drives compact wayfinding badges.
+
+## Iconography
+
+App, widget, and shortcut controls use Google Material Symbols Sharp at weight 400, grade 0, and optical size 24. Use filled icons only for the selected top-level destination. Directional icons mirror in right-to-left layouts. Keep the Meowmos launcher icon and Memos account mark unchanged.
 
 ## Layout
 
@@ -171,7 +175,7 @@ Defined in `MeowmosShapes` (`Shape.kt`):
 ## Components
 
 ### Navigation (`MemosPage.kt`, `MemosNavigation.kt`)
-- **Compact**: Material 3 `ShortNavigationBar` with signal-yellow active pill (`wayfindingContainer`) and crisp icon/label contrast. Top-level tab switches use Material 3 fade-through motion (`180ms` / `140ms`).
+- On compact screens, `ShortNavigationBar` uses `wayfindingContainer` for the selected tab. Tab content fades in over 220 ms and out over 110 ms. The navigation bar stays in place, and each tab retains its saved UI state.
 - **Wide**: Material 3 `NavigationRail` with header FAB and vertical divider.
 
 ### Wayfinding Badges (`WayfindingBadge.kt`)
@@ -179,6 +183,14 @@ Defined in `MeowmosShapes` (`Shape.kt`):
 
 ### Memo Cards (`MemosCard.kt`, `ExploreMemoCard.kt`, `ArchevedMemoCard.kt`)
 - `16dp` rounded surface cards with tabular timestamp + wayfinding metadata row, Markdown content, attachments, and inline comment preview/reply bar.
+- If the feed is empty during initial loading, show three placeholder cards. Their lines pulse for 900 ms in each direction until the placeholders disappear. Cached notes stay visible during refresh.
+- Three-dot menus on memo cards, detail pages, and archived notes use Material 3 Expressive menu groups. Delete goes last in a separate group, uses the `error` color, and requires confirmation.
+- The Home title, search, and sync stay above the feed. The header uses the same background as the feed at every scroll position. Pull-to-refresh shows progress above the notes. If sync fails, the snackbar offers Retry. Server version warnings appear in dialogs.
+- Memo metadata wraps without moving the three-dot menu. The Reply action shows a text label and has less emphasis than the compose button.
+
+### Note and comment editors
+- The space picker sits next to Send. The formatting and attachment toolbar stays above the keyboard. The space, audience, and tag pickers use Material 3 Expressive menu groups.
+- Comments reuse the rounded editor field and Send button. The audience dropdown shows the selected audience's icon and label next to an arrow. Spacing separates the note from the comments. Comment threads use Material 3 Expressive list headers.
 
 ### Search & All Tags (`SearchPage.kt`)
 - Material 3 `SearchBar` paired with a live-filtering `FlowRow` panel showing all account `#tags` as `AssistChip` controls with a signal count badge.
@@ -190,7 +202,7 @@ Defined in `MeowmosShapes` (`Shape.kt`):
 
 ### Do:
 - **Do** reserve `MeowmosTheme.colors.wayfindingContainer` (Signal Yellow) for wayfinding signals: active navigation state, primary FAB, pinned markers, and active posting space.
-- **Do** use `MeowmosTheme.colors` and `MaterialTheme.colorScheme` tokens everywhere so light, dark, and Android 12+ Material You dynamic color stay coherent.
+- Use `MeowmosTheme.colors` and `MaterialTheme.colorScheme` for colors that change with the active palette.
 - **Do** keep one primary FAB per screen (`NavigationRail` header on wide screens, bottom-end `ExtendedFloatingActionButton` on compact screens).
 - **Do** maintain at least `48x48dp` interactive targets via `ActionIconButton` and standard Material 3 controls.
 

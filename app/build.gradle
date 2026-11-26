@@ -31,15 +31,12 @@ android {
 
     defaultConfig {
         applicationId = "io.github.slopcommunistcooperative.meowmos"
-        minSdk = 26
+        minSdk = 35
         targetSdk = 37
-        versionCode = 53
-        versionName = "2.2.0"
+        versionCode = 54
+        versionName = "2.3.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        vectorDrawables {
-            useSupportLibrary = true
-        }
     }
 
     signingConfigs {
@@ -83,9 +80,9 @@ android {
 
 dependencies {
     implementation "androidx.core:core-ktx:${rootProject.ext.core_ktx_version}"
+    implementation "androidx.collection:collection:1.6.0"
     implementation "androidx.compose.ui:ui:${rootProject.ext.compose_version}"
     implementation "androidx.compose.foundation:foundation:${rootProject.ext.compose_version}"
-    implementation "androidx.compose.material:material-icons-extended:${rootProject.ext.compose_material}"
     implementation "androidx.compose.material3:material3:${rootProject.ext.material3}"
     implementation "androidx.compose.material3.adaptive:adaptive:${rootProject.ext.material3_adaptive}"
     implementation "androidx.compose.material3.adaptive:adaptive-layout:${rootProject.ext.material3_adaptive}"

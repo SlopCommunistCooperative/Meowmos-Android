@@ -18,12 +18,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
-import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.Inventory2
-import androidx.compose.material.icons.outlined.Person
-import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -37,14 +31,15 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -86,10 +81,6 @@ fun MePage() {
         }
     }
 
-    LaunchedEffect(Unit) {
-        memosViewModel.loadTags()
-    }
-
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
@@ -106,7 +97,7 @@ fun MePage() {
                         onClick = { rootNavController.navigate(RouteName.SETTINGS) },
                     ) {
                         Icon(
-                            imageVector = Icons.Outlined.Settings,
+                            imageVector = ImageVector.vectorResource(R.drawable.symbol_settings),
                             contentDescription = null,
                         )
                     }
@@ -249,7 +240,7 @@ fun MePage() {
                                     shape = MaterialTheme.shapes.small,
                                 ) {
                                     Icon(
-                                        imageVector = Icons.Outlined.Inventory2,
+                                        imageVector = ImageVector.vectorResource(R.drawable.symbol_inventory_2),
                                         contentDescription = null,
                                         modifier = Modifier.padding(8.dp).size(20.dp),
                                     )
@@ -257,7 +248,7 @@ fun MePage() {
                             },
                             trailingContent = {
                                 Icon(
-                                    imageVector = Icons.AutoMirrored.Outlined.KeyboardArrowRight,
+                                    imageVector = ImageVector.vectorResource(R.drawable.symbol_keyboard_arrow_right),
                                     contentDescription = null,
                                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
@@ -291,7 +282,7 @@ fun MePage() {
                                     shape = MaterialTheme.shapes.small,
                                 ) {
                                     Icon(
-                                        imageVector = Icons.Outlined.Settings,
+                                        imageVector = ImageVector.vectorResource(R.drawable.symbol_settings),
                                         contentDescription = null,
                                         modifier = Modifier.padding(8.dp).size(20.dp),
                                     )
@@ -299,7 +290,7 @@ fun MePage() {
                             },
                             trailingContent = {
                                 Icon(
-                                    imageVector = Icons.AutoMirrored.Outlined.KeyboardArrowRight,
+                                    imageVector = ImageVector.vectorResource(R.drawable.symbol_keyboard_arrow_right),
                                     contentDescription = null,
                                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
@@ -332,9 +323,9 @@ private fun AccountIdentityCard(
         null -> null
     }
     val badgeIcon = when (account) {
-        is Account.Local -> Icons.Outlined.Home
+        is Account.Local -> ImageVector.vectorResource(R.drawable.symbol_home)
         is Account.MemosV0, is Account.MemosV1 -> MemosIcon
-        null -> Icons.Outlined.Person
+        null -> ImageVector.vectorResource(R.drawable.symbol_person)
     }
 
     Card(
@@ -399,7 +390,7 @@ private fun AccountIdentityCard(
                 }
             }
             Icon(
-                imageVector = Icons.AutoMirrored.Outlined.KeyboardArrowRight,
+                imageVector = ImageVector.vectorResource(R.drawable.symbol_keyboard_arrow_right),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )

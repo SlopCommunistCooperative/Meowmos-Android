@@ -10,8 +10,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
@@ -24,6 +22,8 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -98,7 +98,7 @@ fun AccountPage(
                     IconButton(onClick = {
                         navController.popBackStackIfLifecycleIsResumed(lifecycleOwner)
                     }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = R.string.back.string)
+                        Icon(ImageVector.vectorResource(R.drawable.symbol_arrow_back), contentDescription = R.string.back.string)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -139,7 +139,7 @@ fun AccountPage(
                                 navController.context.getString(R.string.transfer_local_memos_success, count, name),
                                 Toast.LENGTH_SHORT
                             ).show()
-                            // Show the copies where they went; returning to the list syncs them up.
+                            // Show the copies in the destination account, even if it is offline.
                             // The switch happens even if loading the user fails (server offline).
                             userStateViewModel.switchAccount(target.accountKey())
                             navController.popBackStackIfLifecycleIsResumed(lifecycleOwner)
@@ -207,7 +207,6 @@ fun AccountPage(
     LaunchedEffect(viewModel.importResult) {
         if (viewModel.importResult != null && currentAccount is Account.Local) {
             memosViewModel.refreshLocalSnapshot()
-            memosViewModel.loadTags()
         }
     }
 

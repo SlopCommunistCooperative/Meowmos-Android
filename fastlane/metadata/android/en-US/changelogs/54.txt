@@ -1,0 +1,8 @@
+* Material 3 Expressive adds spring animations and a new loading indicator.
+* App, widget, and shortcut icons use Material Symbols Sharp.
+* Note and archive menus, the note editor, and comment controls use Material 3 Expressive.
+* Tabs fade without reloading cached notes. Home shows placeholders while an empty feed loads.
+* Home keeps its title, search, and sync above the feed on the same background. Sync failures offer Retry. Note details wrap without moving the menu, and Reply has a text label.
+* The comment audience dropdown shows an icon and label. Spacing replaces the line between a note and its comments.
+* Turn off Material You colors in Settings to use the Meowmos palette.
+* Requires Android 15 or later.

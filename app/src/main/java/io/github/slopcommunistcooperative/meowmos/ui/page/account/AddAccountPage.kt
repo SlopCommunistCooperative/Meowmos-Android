@@ -6,9 +6,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -21,6 +18,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -79,7 +78,7 @@ fun AddAccountPage(
                             navController.popBackStackIfLifecycleIsResumed(lifecycleOwner)
                         }) {
                             Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                imageVector = ImageVector.vectorResource(R.drawable.symbol_arrow_back),
                                 contentDescription = R.string.back.string
                             )
                         }
@@ -119,7 +118,7 @@ fun AddAccountPage(
                             supportingContent = { Text(R.string.local_account_description.string) },
                             leadingContent = {
                                 Icon(
-                                    imageVector = Icons.Outlined.Home,
+                                    imageVector = ImageVector.vectorResource(R.drawable.symbol_home),
                                     contentDescription = null,
                                     tint = MaterialTheme.colorScheme.primary
                                 )

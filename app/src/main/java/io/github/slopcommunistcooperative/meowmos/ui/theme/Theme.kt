@@ -1,12 +1,11 @@
 package io.github.slopcommunistcooperative.meowmos.ui.theme
 
 import android.graphics.Color
-import android.os.Build
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialExpressiveTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
@@ -130,24 +129,22 @@ object MeowmosTheme {
 @Composable
 fun MeowmosTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit,
 ) {
-    val isDynamic = dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
     val colorScheme = when {
-        isDynamic -> {
+        dynamicColor -> {
             val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
     }
-    val extendedColors = remember(colorScheme, darkTheme, isDynamic) {
+    val extendedColors = remember(colorScheme, darkTheme, dynamicColor) {
         meowmosExtendedColorsFor(
             colorScheme = colorScheme,
             darkTheme = darkTheme,
-            isDynamic = isDynamic,
+            isDynamic = dynamicColor,
         )
     }
 
@@ -160,9 +157,7 @@ fun MeowmosTheme(
                 navigationBarStyle = SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT) { darkTheme },
             )
             val window = activity.window
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                window.isNavigationBarContrastEnforced = false
-            }
+            window.isNavigationBarContrastEnforced = false
             WindowCompat.getInsetsController(window, view).apply {
                 isAppearanceLightStatusBars = !darkTheme
                 isAppearanceLightNavigationBars = !darkTheme
@@ -171,7 +166,7 @@ fun MeowmosTheme(
     }
 
     CompositionLocalProvider(LocalMeowmosColors provides extendedColors) {
-        MaterialTheme(
+        MaterialExpressiveTheme(
             colorScheme = colorScheme,
             shapes = MeowmosShapes,
             typography = MeowmosTypography,

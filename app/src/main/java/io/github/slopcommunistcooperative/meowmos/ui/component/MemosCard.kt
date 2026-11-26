@@ -4,39 +4,25 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Intent
 import android.text.format.DateUtils
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.outlined.Archive
-import androidx.compose.material.icons.outlined.CloudOff
-import androidx.compose.material.icons.outlined.ContentCopy
-import androidx.compose.material.icons.outlined.Delete
-import androidx.compose.material.icons.outlined.Edit
-import androidx.compose.material.icons.outlined.Link
-import androidx.compose.material.icons.outlined.PinDrop
-import androidx.compose.material.icons.outlined.PushPin
-import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -116,49 +102,55 @@ fun MemosCard(
                 modifier = Modifier
                     .padding(start = 16.dp, end = 4.dp, top = 4.dp)
                     .fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                verticalAlignment = Alignment.Top,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                Text(
-                    DateUtils.getRelativeTimeSpanString(
-                        memo.date.toEpochMilli(),
-                        System.currentTimeMillis(),
-                        DateUtils.SECOND_IN_MILLIS
-                    ).toString(),
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                if (memo.pinned) {
-                    WayfindingBadge(
-                        text = stringResource(R.string.pinned),
-                        icon = Icons.Outlined.PushPin,
-                        tone = WayfindingTone.Signal,
+                FlowRow(
+                    modifier = Modifier.weight(1f).align(Alignment.CenterVertically).padding(vertical = 4.dp),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                    itemVerticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        DateUtils.getRelativeTimeSpanString(
+                            memo.date.toEpochMilli(),
+                            System.currentTimeMillis(),
+                            DateUtils.SECOND_IN_MILLIS
+                        ).toString(),
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
+                    if (memo.pinned) {
+                        WayfindingBadge(
+                            text = stringResource(R.string.pinned),
+                            icon = ImageVector.vectorResource(R.drawable.symbol_push_pin),
+                            tone = WayfindingTone.Signal,
+                        )
+                    }
+                    if (spaceLabel != null) {
+                        WayfindingBadge(
+                            text = spaceLabel,
+                            tone = WayfindingTone.Beacon,
+                            modifier = Modifier.widthIn(max = 140.dp),
+                        )
+                    }
+                    if (showSyncStatus && memo.needsSync) {
+                        Icon(
+                            ImageVector.vectorResource(R.drawable.symbol_cloud_off),
+                            contentDescription = R.string.memo_sync_pending.string,
+                            modifier = Modifier.size(18.dp),
+                            tint = MaterialTheme.colorScheme.error,
+                        )
+                    }
+                    if (LocalUserState.current.currentUser?.defaultVisibility != memo.visibility) {
+                        Icon(
+                            memo.visibility.icon,
+                            contentDescription = stringResource(memo.visibility.titleResource),
+                            modifier = Modifier.size(18.dp),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
                 }
-                if (spaceLabel != null) {
-                    WayfindingBadge(
-                        text = spaceLabel,
-                        tone = WayfindingTone.Beacon,
-                        modifier = Modifier.widthIn(max = 140.dp),
-                    )
-                }
-                if (showSyncStatus && memo.needsSync) {
-                    Icon(
-                        imageVector = Icons.Outlined.CloudOff,
-                        contentDescription = R.string.memo_sync_pending.string,
-                        modifier = Modifier.size(18.dp),
-                        tint = MaterialTheme.colorScheme.error,
-                    )
-                }
-                if (LocalUserState.current.currentUser?.defaultVisibility != memo.visibility) {
-                    Icon(
-                        memo.visibility.icon,
-                        contentDescription = stringResource(memo.visibility.titleResource),
-                        modifier = Modifier.size(18.dp),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-                Spacer(modifier = Modifier.weight(1f))
                 MemosCardActionButton(memo)
             }
             MemoContent(
@@ -194,7 +186,6 @@ fun MemosCard(
 fun MemosCardActionButton(
     memo: MemoEntity,
 ) {
-    var menuExpanded by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val clipboardManager = context.getSystemService(ClipboardManager::class.java)
     val memosViewModel = LocalMemos.current
@@ -205,143 +196,46 @@ fun MemosCardActionButton(
     var showDeleteDialog by remember { mutableStateOf(false) }
     val memoLabel = stringResource(R.string.memo)
 
-    Box {
-        ActionIconButton(label = stringResource(R.string.more_options), onClick = { menuExpanded = true }) {
-            Icon(Icons.Filled.MoreVert, contentDescription = null)
-        }
-        DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
-            if (memo.pinned) {
-                DropdownMenuItem(
-                    text = { Text(R.string.unpin.string) },
-                    onClick = {
-                        scope.launch {
-                            memosViewModel.updateMemoPinned(memo.identifier, false).suspendOnSuccess {
-                                menuExpanded = false
-                            }
-                        }
-                    },
-                    leadingIcon = {
-                        Icon(
-                            Icons.Outlined.PinDrop,
-                            contentDescription = null
-                        )
-                    })
-            } else {
-                DropdownMenuItem(
-                    text = { Text(R.string.pin.string) },
-                    onClick = {
-                        scope.launch {
-                            memosViewModel.updateMemoPinned(memo.identifier, true).suspendOnSuccess {
-                                menuExpanded = false
-                            }
-                        }
-                    },
-                    leadingIcon = {
-                        Icon(
-                            Icons.Outlined.PushPin,
-                            contentDescription = null
-                        )
-                    })
-            }
-            DropdownMenuItem(
-                text = { Text(R.string.edit.string) },
-                onClick = {
-                    rootNavController.navigateToMemoEditor(memo.identifier)
-                },
-                leadingIcon = {
-                    Icon(
-                        Icons.Outlined.Edit,
-                        contentDescription = null
-                    )
-                })
-            DropdownMenuItem(
-                text = { Text(R.string.share.string) },
-                onClick = {
-                    val sendIntent = Intent().apply {
-                        action = Intent.ACTION_SEND
-                        putExtra(Intent.EXTRA_TEXT, memo.content)
-                        type = "text/plain"
-                    }
-                    val shareIntent = Intent.createChooser(sendIntent, null)
-                    context.startActivity(shareIntent)
-                },
-                leadingIcon = {
-                    Icon(
-                        Icons.Outlined.Share,
-                        contentDescription = null
-                    )
-                })
-            DropdownMenuItem(
-                text = { Text(R.string.copy.string) },
-                onClick = {
-                    clipboardManager?.setPrimaryClip(
-                        ClipData.newPlainText(memoLabel, memo.content)
-                    )
-                    menuExpanded = false
-                },
-                leadingIcon = {
-                    Icon(
-                        Icons.Outlined.ContentCopy,
-                        contentDescription = null
-                    )
-                })
+    MemoOverflowMenu(onDelete = { showDeleteDialog = true }) {
+        buildList {
+            add(
+                MemoMenuAction(
+                    if (memo.pinned) R.string.unpin else R.string.pin,
+                    if (memo.pinned) R.drawable.symbol_pin_drop else R.drawable.symbol_push_pin,
+                ) {
+                    scope.launch { memosViewModel.updateMemoPinned(memo.identifier, !memo.pinned) }
+                }
+            )
+            add(MemoMenuAction(R.string.edit, R.drawable.symbol_edit) {
+                rootNavController.navigateToMemoEditor(memo.identifier)
+            })
+            add(MemoMenuAction(R.string.share, R.drawable.symbol_share) {
+                val sendIntent = Intent().apply {
+                    action = Intent.ACTION_SEND
+                    putExtra(Intent.EXTRA_TEXT, memo.content)
+                    type = "text/plain"
+                }
+                context.startActivity(Intent.createChooser(sendIntent, null))
+            })
+            add(MemoMenuAction(R.string.copy, R.drawable.symbol_content_copy) {
+                clipboardManager?.setPrimaryClip(ClipData.newPlainText(memoLabel, memo.content))
+            })
             if (currentAccount !is Account.Local) {
-                DropdownMenuItem(
-                    text = { Text(R.string.copy_link.string) },
-                    onClick = {
-                        memosViewModel.host.value?.let { host ->
-                            val memoUrl = "$host/${memo.remoteId ?: memo.identifier}"
-                            val sendIntent = Intent().apply {
-                                action = Intent.ACTION_SEND
-                                putExtra(Intent.EXTRA_TEXT, memoUrl)
-                                type = "text/plain"
-                            }
-                            val shareIntent = Intent.createChooser(sendIntent, null)
-                            context.startActivity(shareIntent)
+                add(MemoMenuAction(R.string.copy_link, R.drawable.symbol_link) {
+                    memosViewModel.host.value?.let { host ->
+                        val memoUrl = "$host/${memo.remoteId ?: memo.identifier}"
+                        val sendIntent = Intent().apply {
+                            action = Intent.ACTION_SEND
+                            putExtra(Intent.EXTRA_TEXT, memoUrl)
+                            type = "text/plain"
                         }
-                    },
-                    leadingIcon = {
-                        Icon(
-                            Icons.Outlined.Link,
-                            contentDescription = null
-                        )
-                    })
-            }
-            DropdownMenuItem(
-                text = { Text(R.string.archive.string) },
-                onClick = {
-                    scope.launch {
-                        memosViewModel.archiveMemo(memo.identifier).suspendOnSuccess {
-                            menuExpanded = false
-                        }
+                        context.startActivity(Intent.createChooser(sendIntent, null))
                     }
-                },
-                colors = MenuDefaults.itemColors(
-                    textColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    leadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                ),
-                leadingIcon = {
-                    Icon(
-                        Icons.Outlined.Archive,
-                        contentDescription = null
-                    )
                 })
-            DropdownMenuItem(
-                text = { Text(R.string.delete.string) },
-                onClick = {
-                    showDeleteDialog = true
-                    menuExpanded = false
-                },
-                colors = MenuDefaults.itemColors(
-                    textColor = MaterialTheme.colorScheme.error,
-                    leadingIconColor = MaterialTheme.colorScheme.error,
-                ),
-                leadingIcon = {
-                    Icon(
-                        Icons.Outlined.Delete,
-                        contentDescription = null
-                    )
-                })
+            }
+            add(MemoMenuAction(R.string.archive, R.drawable.symbol_archive) {
+                scope.launch { memosViewModel.archiveMemo(memo.identifier) }
+            })
         }
     }
 

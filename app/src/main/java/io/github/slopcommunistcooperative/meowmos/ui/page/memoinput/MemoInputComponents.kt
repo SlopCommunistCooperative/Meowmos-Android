@@ -9,46 +9,47 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Send
-import androidx.compose.material.icons.automirrored.outlined.FormatListBulleted
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.outlined.Attachment
-import androidx.compose.material.icons.outlined.Check
-import androidx.compose.material.icons.outlined.CheckBox
-import androidx.compose.material.icons.outlined.FormatBold
-import androidx.compose.material.icons.outlined.FormatItalic
-import androidx.compose.material.icons.outlined.FormatListNumbered
-import androidx.compose.material.icons.outlined.FormatStrikethrough
-import androidx.compose.material.icons.outlined.Image
-import androidx.compose.material.icons.outlined.LocationOn
-import androidx.compose.material.icons.outlined.PhotoCamera
-import androidx.compose.material.icons.outlined.Tag
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.FilledTonalButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuGroup
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.DropdownMenuPopup
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.FilledTonalIconButton
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.HorizontalFloatingToolbar
 import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.LoadingIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorPosition
+import androidx.compose.material3.MenuDefaults
+import androidx.compose.material3.SelectableDropdownMenuItem
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -65,7 +66,12 @@ import androidx.compose.ui.draganddrop.mimeTypes
 import androidx.compose.ui.draganddrop.toAndroidDragEvent
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.TextFieldValue
@@ -119,22 +125,66 @@ internal fun MemoInputTopBar(
         },
         navigationIcon = {
             ActionIconButton(label = stringResource(R.string.close), onClick = requestClose) {
-                Icon(Icons.Filled.Close, contentDescription = stringResource(R.string.close))
+                Icon(ImageVector.vectorResource(R.drawable.symbol_close), contentDescription = stringResource(R.string.close))
             }
         },
         actions = {
             destination()
-            ActionIconButton(
+            EditorSendButton(
                 label = stringResource(R.string.post),
                 enabled = initialized && canSubmit,
                 onClick = onSubmit
-            ) {
-                Icon(Icons.AutoMirrored.Filled.Send, contentDescription = stringResource(R.string.post))
-            }
+            )
         }
     )
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+internal fun EditorSendButton(
+    label: String,
+    enabled: Boolean,
+    onClick: () -> Unit,
+    posting: Boolean = false,
+) {
+    FilledIconButton(
+        onClick = onClick,
+        enabled = enabled,
+        shapes = IconButtonDefaults.shapes(),
+        modifier = Modifier.semantics { contentDescription = label },
+    ) {
+        if (posting) {
+            LoadingIndicator(modifier = Modifier.size(24.dp), color = MaterialTheme.colorScheme.onSurfaceVariant)
+        } else {
+            Icon(ImageVector.vectorResource(R.drawable.symbol_send), contentDescription = null)
+        }
+    }
+}
+
+@Composable
+private fun EditorOptionsMenu(
+    expanded: Boolean,
+    onDismissRequest: () -> Unit,
+    aboveAnchor: Boolean = false,
+    content: @Composable () -> Unit,
+) {
+    DropdownMenuPopup(
+        expanded = expanded,
+        onDismissRequest = onDismissRequest,
+        popupPositionProvider = MenuDefaults.rememberDropdownMenuPopupPositionProvider(
+            if (aboveAnchor) MenuAnchorPosition.Above else MenuAnchorPosition.Below,
+        ),
+        properties = if (aboveAnchor) PopupProperties(focusable = false) else MenuDefaults.DefaultMenuProperties,
+    ) {
+        DropdownMenuGroup(
+            shapes = MenuDefaults.groupShapes(),
+            modifier = Modifier.verticalScroll(rememberScrollState()),
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+        ) { content() }
+    }
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 internal fun MemoSpacePicker(
     spaces: List<MemoSpace>,
@@ -153,8 +203,8 @@ internal fun MemoSpacePicker(
     val hasSelectedSpace = selected != null
     Box {
         FilledTonalButton(
-            onClick = { expanded = true },
-            shape = MaterialTheme.shapes.small,
+            onClick = { expanded = !expanded },
+            shapes = ButtonDefaults.shapes(),
             colors = if (hasSelectedSpace) {
                 ButtonDefaults.filledTonalButtonColors(
                     containerColor = MeowmosTheme.colors.wayfindingContainer,
@@ -166,7 +216,7 @@ internal fun MemoSpacePicker(
                     contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             },
-            contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 10.dp, vertical = 4.dp),
+            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
         ) {
             Text(
                 label,
@@ -176,21 +226,21 @@ internal fun MemoSpacePicker(
                 overflow = TextOverflow.Ellipsis,
             )
             Icon(
-                Icons.Filled.ArrowDropDown,
+                ImageVector.vectorResource(R.drawable.symbol_arrow_drop_down),
                 contentDescription = stringResource(R.string.memo_select_space),
                 modifier = Modifier.size(18.dp),
             )
         }
-        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-            (listOf(null) + spaces).forEach { space ->
-                DropdownMenuItem(
+        EditorOptionsMenu(expanded, onDismissRequest = { expanded = false }) {
+            val options = listOf(null) + spaces
+            options.forEachIndexed { index, space ->
+                SelectableDropdownMenuItem(
+                    selected = space?.name == selected,
+                    shapes = MenuDefaults.itemShape(index, options.size),
                     text = { Text(space?.title ?: noSpace) },
                     onClick = {
                         expanded = false
                         onSelect(space)
-                    },
-                    trailingIcon = {
-                        if (space?.name == selected) Icon(Icons.Outlined.Check, contentDescription = null)
                     },
                 )
             }
@@ -198,6 +248,7 @@ internal fun MemoSpacePicker(
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 internal fun MemoVisibilityPicker(
     currentVisibility: MemoVisibility,
@@ -207,38 +258,64 @@ internal fun MemoVisibilityPicker(
     onVisibilitySelected: (MemoVisibility) -> Unit,
     enabled: Boolean = true,
     label: String = stringResource(currentVisibility.titleResource),
+    showLabel: Boolean = false,
 ) {
     Box {
-        DropdownMenu(
+        EditorOptionsMenu(
             expanded = expanded && enabled,
             onDismissRequest = { onExpandedChange(false) },
-            properties = PopupProperties(focusable = false)
+            aboveAnchor = true,
         ) {
-            for (visibility in MemoVisibility.entries) {
-                if (visibility == MemoVisibility.SPACE && !showSpaceVisibility) continue
-
-                val title = stringResource(visibility.titleResource)
-                DropdownMenuItem(
-                    text = { Text(title) },
+            val options = if (showSpaceVisibility) MemoVisibility.entries else NonSpaceVisibilities
+            options.forEachIndexed { index, visibility ->
+                SelectableDropdownMenuItem(
+                    selected = currentVisibility == visibility,
+                    shapes = MenuDefaults.itemShape(index, options.size),
+                    text = { Text(stringResource(visibility.titleResource)) },
                     onClick = {
                         onVisibilitySelected(visibility)
                         onExpandedChange(false)
                     },
-                    enabled = enabled,
-                    leadingIcon = { Icon(visibility.icon, contentDescription = title) },
-                    trailingIcon = {
-                        if (currentVisibility == visibility) {
-                            Icon(Icons.Outlined.Check, contentDescription = null)
-                        }
-                    }
+                    leadingIcon = { Icon(visibility.icon, contentDescription = null) },
                 )
             }
         }
-        ActionIconButton(label = label, enabled = enabled, onClick = { onExpandedChange(!expanded) }) {
-            Icon(currentVisibility.icon, contentDescription = label)
+        if (showLabel) {
+            FilledTonalButton(
+                shapes = ButtonDefaults.shapes(),
+                enabled = enabled,
+                onClick = { onExpandedChange(!expanded) },
+                modifier = Modifier.semantics { contentDescription = label },
+                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
+            ) {
+                Icon(currentVisibility.icon, contentDescription = null, modifier = Modifier.size(18.dp))
+                Spacer(Modifier.size(8.dp))
+                Text(
+                    stringResource(currentVisibility.titleResource),
+                    modifier = Modifier.weight(1f, fill = false),
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                Icon(
+                    ImageVector.vectorResource(R.drawable.symbol_arrow_drop_down),
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp),
+                )
+            }
+        } else {
+            FilledTonalIconButton(
+                shapes = IconButtonDefaults.shapes(),
+                enabled = enabled,
+                onClick = { onExpandedChange(!expanded) },
+                modifier = Modifier.semantics { contentDescription = label },
+            ) {
+                Icon(currentVisibility.icon, contentDescription = null)
+            }
         }
     }
 }
+
+private val NonSpaceVisibilities = MemoVisibility.entries.filterNot { it == MemoVisibility.SPACE }
 
 @Composable
 private fun FormattingButtons(
@@ -247,11 +324,11 @@ private fun FormattingButtons(
     MarkdownFormat.entries.forEach { format ->
         ActionIconButton(label = format.label, onClick = { onFormat(format) }) {
             when (format) {
-                MarkdownFormat.BOLD -> Icon(Icons.Outlined.FormatBold, contentDescription = format.label)
-                MarkdownFormat.ITALIC -> Icon(Icons.Outlined.FormatItalic, contentDescription = format.label)
-                MarkdownFormat.STRIKETHROUGH -> Icon(Icons.Outlined.FormatStrikethrough, contentDescription = format.label)
-                MarkdownFormat.BULLET -> Icon(Icons.AutoMirrored.Outlined.FormatListBulleted, contentDescription = format.label)
-                MarkdownFormat.NUMBERED -> Icon(Icons.Outlined.FormatListNumbered, contentDescription = format.label)
+                MarkdownFormat.BOLD -> Icon(ImageVector.vectorResource(R.drawable.symbol_format_bold), contentDescription = format.label)
+                MarkdownFormat.ITALIC -> Icon(ImageVector.vectorResource(R.drawable.symbol_format_italic), contentDescription = format.label)
+                MarkdownFormat.STRIKETHROUGH -> Icon(ImageVector.vectorResource(R.drawable.symbol_format_strikethrough), contentDescription = format.label)
+                MarkdownFormat.BULLET -> Icon(ImageVector.vectorResource(R.drawable.symbol_format_list_bulleted), contentDescription = format.label)
+                MarkdownFormat.NUMBERED -> Icon(ImageVector.vectorResource(R.drawable.symbol_format_list_numbered), contentDescription = format.label)
                 MarkdownFormat.H1, MarkdownFormat.H2, MarkdownFormat.H3 -> Text(
                     text = format.label,
                     fontWeight = FontWeight.Bold,
@@ -285,81 +362,75 @@ internal fun MemoInputBottomBar(
 ) {
     val scrollState = rememberScrollState()
 
-    BottomAppBar {
+    HorizontalFloatingToolbar(
+        expanded = true,
+        modifier = Modifier.fillMaxWidth()
+            .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom))
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        shape = MaterialTheme.shapes.large,
+    ) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
+            modifier = Modifier.horizontalScroll(scrollState),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            Row(
-                modifier = Modifier.horizontalScroll(scrollState),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                if (currentAccount !is Account.Local) {
-                    MemoVisibilityPicker(
-                        currentVisibility = currentVisibility,
-                        showSpaceVisibility = showSpaceVisibility,
-                        expanded = visibilityMenuExpanded,
-                        onExpandedChange = onVisibilityExpandedChange,
-                        onVisibilitySelected = onVisibilitySelected,
-                    )
-                }
-
-                if (tags.isEmpty()) {
-                    ActionIconButton(label = stringResource(R.string.tag), onClick = onHashTagClick) {
-                        Icon(Icons.Outlined.Tag, contentDescription = stringResource(R.string.tag))
-                    }
-                } else {
-                    Box {
-                        DropdownMenu(
-                            expanded = tagMenuExpanded,
-                            onDismissRequest = { onTagExpandedChange(false) },
-                            properties = PopupProperties(focusable = false)
-                        ) {
-                            tags.forEach { tag ->
-                                DropdownMenuItem(
-                                    text = { Text(tag) },
-                                    onClick = {
-                                        onTagSelected(tag)
-                                        onTagExpandedChange(false)
-                                    },
-                                    leadingIcon = {
-                                        Icon(Icons.Outlined.Tag, contentDescription = null)
-                                    }
-                                )
-                            }
-                        }
-                        ActionIconButton(label = stringResource(R.string.tags), onClick = { onTagExpandedChange(!tagMenuExpanded) }) {
-                            Icon(Icons.Outlined.Tag, contentDescription = stringResource(R.string.tag))
-                        }
-                    }
-                }
-
-                ActionIconButton(label = stringResource(R.string.add_task), onClick = onToggleTodoItem) {
-                    Icon(Icons.Outlined.CheckBox, contentDescription = stringResource(R.string.add_task))
-                }
-
-                ActionIconButton(label = stringResource(R.string.add_image), onClick = onPickImage) {
-                    Icon(Icons.Outlined.Image, contentDescription = stringResource(R.string.add_image))
-                }
-
-                ActionIconButton(label = stringResource(R.string.attachment), onClick = onPickAttachment) {
-                    Icon(Icons.Outlined.Attachment, contentDescription = stringResource(R.string.attachment))
-                }
-
-                ActionIconButton(label = stringResource(R.string.take_photo), onClick = onTakePhoto) {
-                    Icon(Icons.Outlined.PhotoCamera, contentDescription = stringResource(R.string.take_photo))
-                }
-
-                if (showLocation) {
-                    ActionIconButton(label = stringResource(R.string.memo_location), onClick = onLocationClick) {
-                        Icon(Icons.Outlined.LocationOn, contentDescription = stringResource(R.string.memo_location))
-                    }
-                }
-
-                Spacer(modifier = Modifier.size(4.dp))
-
-                FormattingButtons(onFormat = onFormat)
+            if (currentAccount !is Account.Local) {
+                MemoVisibilityPicker(
+                    currentVisibility = currentVisibility,
+                    showSpaceVisibility = showSpaceVisibility,
+                    expanded = visibilityMenuExpanded,
+                    onExpandedChange = onVisibilityExpandedChange,
+                    onVisibilitySelected = onVisibilitySelected,
+                )
             }
+            if (tags.isEmpty()) {
+                ActionIconButton(label = stringResource(R.string.tag), onClick = onHashTagClick) {
+                    Icon(ImageVector.vectorResource(R.drawable.symbol_tag), contentDescription = null)
+                }
+            } else {
+                Box {
+                    EditorOptionsMenu(
+                        expanded = tagMenuExpanded,
+                        onDismissRequest = { onTagExpandedChange(false) },
+                        aboveAnchor = true,
+                    ) {
+                        tags.forEachIndexed { index, tag ->
+                            DropdownMenuItem(
+                                shape = MenuDefaults.itemShape(index, tags.size).shape,
+                                text = { Text(tag) },
+                                onClick = {
+                                    onTagSelected(tag)
+                                    onTagExpandedChange(false)
+                                },
+                                leadingIcon = {
+                                    Icon(ImageVector.vectorResource(R.drawable.symbol_tag), contentDescription = null)
+                                },
+                            )
+                        }
+                    }
+                    ActionIconButton(label = stringResource(R.string.tags), onClick = { onTagExpandedChange(!tagMenuExpanded) }) {
+                        Icon(ImageVector.vectorResource(R.drawable.symbol_tag), contentDescription = null)
+                    }
+                }
+            }
+            ActionIconButton(label = stringResource(R.string.add_task), onClick = onToggleTodoItem) {
+                Icon(ImageVector.vectorResource(R.drawable.symbol_check_box), contentDescription = null)
+            }
+            ActionIconButton(label = stringResource(R.string.add_image), onClick = onPickImage) {
+                Icon(ImageVector.vectorResource(R.drawable.symbol_image), contentDescription = null)
+            }
+            ActionIconButton(label = stringResource(R.string.attachment), onClick = onPickAttachment) {
+                Icon(ImageVector.vectorResource(R.drawable.symbol_attachment), contentDescription = null)
+            }
+            ActionIconButton(label = stringResource(R.string.take_photo), onClick = onTakePhoto) {
+                Icon(ImageVector.vectorResource(R.drawable.symbol_photo_camera), contentDescription = null)
+            }
+            if (showLocation) {
+                ActionIconButton(label = stringResource(R.string.memo_location), onClick = onLocationClick) {
+                    Icon(ImageVector.vectorResource(R.drawable.symbol_location_on), contentDescription = null)
+                }
+            }
+            Spacer(modifier = Modifier.size(4.dp))
+            FormattingButtons(onFormat = onFormat)
         }
     }
 }
@@ -371,13 +442,26 @@ internal fun MemoEditorTextField(
     onTextChange: (TextFieldValue) -> Unit,
     label: String,
     enabled: Boolean = true,
+    errorMessage: String? = null,
 ) {
-    OutlinedTextField(
+    TextField(
         modifier = modifier,
         value = text,
         label = { Text(label) },
         onValueChange = onTextChange,
         enabled = enabled,
+        shape = MaterialTheme.shapes.large,
+        textStyle = MaterialTheme.typography.bodyLarge,
+        isError = errorMessage != null,
+        supportingText = errorMessage?.let { message -> { Text(message) } },
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent,
+            disabledIndicatorColor = Color.Transparent,
+            errorIndicatorColor = Color.Transparent,
+        ),
         keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences)
     )
 }
@@ -435,7 +519,7 @@ internal fun MemoInputEditor(
         MemoEditorTextField(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 20.dp, end = 20.dp, bottom = 20.dp)
+                .padding(horizontal = 16.dp, vertical = 8.dp)
                 .weight(1f)
                 .focusRequester(focusRequester),
             text = text,
@@ -481,6 +565,7 @@ internal fun MemoInputEditor(
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 internal fun SaveChangesDialog(
     onSave: () -> Unit,
@@ -492,12 +577,12 @@ internal fun SaveChangesDialog(
         title = { Text(stringResource(R.string.save_changes_title)) },
         text = { Text(stringResource(R.string.save_changes_message)) },
         confirmButton = {
-            Button(onClick = onSave) {
+            Button(onClick = onSave, shapes = ButtonDefaults.shapes()) {
                 Text(stringResource(R.string.save))
             }
         },
         dismissButton = {
-            Button(onClick = onDiscard) {
+            TextButton(onClick = onDiscard, shapes = ButtonDefaults.shapes()) {
                 Text(stringResource(R.string.discard))
             }
         }

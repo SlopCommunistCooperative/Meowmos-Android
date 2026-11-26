@@ -2,7 +2,6 @@ package io.github.slopcommunistcooperative.meowmos.ui.media
 
 import android.content.Context
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.widget.VideoView
 import androidx.activity.compose.BackHandler
@@ -34,10 +33,6 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.BrokenImage
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -60,12 +55,14 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -117,7 +114,7 @@ class MediaViewerActivity : FragmentActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        overridePendingTransitionCompat(0, 0)
+        overrideActivityTransition(OVERRIDE_TRANSITION_OPEN, 0, 0)
         super.onCreate(savedInstanceState)
         hideStatusBar()
 
@@ -158,7 +155,7 @@ class MediaViewerActivity : FragmentActivity() {
 
     override fun finish() {
         super.finish()
-        overridePendingTransitionCompat(0, 0)
+        overrideActivityTransition(OVERRIDE_TRANSITION_CLOSE, 0, 0)
     }
 
     private fun hideStatusBar() {
@@ -173,15 +170,6 @@ class MediaViewerActivity : FragmentActivity() {
         finish()
     }
 
-    @Suppress("DEPRECATION")
-    private fun overridePendingTransitionCompat(enterAnim: Int, exitAnim: Int) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-            overrideActivityTransition(OVERRIDE_TRANSITION_OPEN, enterAnim, exitAnim)
-            overrideActivityTransition(OVERRIDE_TRANSITION_CLOSE, enterAnim, exitAnim)
-        } else {
-            overridePendingTransition(enterAnim, exitAnim)
-        }
-    }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -325,7 +313,7 @@ private fun MediaViewerScreen(
                 .padding(12.dp)
         ) {
             Icon(
-                imageVector = Icons.Filled.Close,
+                imageVector = ImageVector.vectorResource(R.drawable.symbol_close),
                 contentDescription = R.string.close.string,
                 tint = Color.White
             )
@@ -540,7 +528,7 @@ private fun MediaViewerPage(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Icon(
-                    imageVector = Icons.Filled.BrokenImage,
+                    imageVector = ImageVector.vectorResource(R.drawable.symbol_broken_image),
                     contentDescription = null,
                     tint = Color.White
                 )
@@ -580,7 +568,7 @@ private fun LivePhotoButton(
         horizontalArrangement = Arrangement.spacedBy(5.dp)
     ) {
         Icon(
-            imageVector = Icons.Filled.PlayArrow,
+            imageVector = ImageVector.vectorResource(R.drawable.symbol_play_arrow),
             contentDescription = null,
             tint = Color.White
         )

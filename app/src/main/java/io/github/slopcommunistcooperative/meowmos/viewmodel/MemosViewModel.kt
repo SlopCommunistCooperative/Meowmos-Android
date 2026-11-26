@@ -3,6 +3,7 @@ package io.github.slopcommunistcooperative.meowmos.viewmodel
 import android.content.Context
 import android.net.Uri
 import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
@@ -20,6 +21,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
@@ -46,6 +48,7 @@ import io.github.slopcommunistcooperative.meowmos.ext.settingsDataStore
 import io.github.slopcommunistcooperative.meowmos.ext.string
 import io.github.slopcommunistcooperative.meowmos.ext.updateUserSettings
 import io.github.slopcommunistcooperative.meowmos.widget.WidgetUpdater
+import io.github.slopcommunistcooperative.meowmos.util.extractCustomTags
 import timber.log.Timber
 import java.io.IOException
 import java.time.LocalDate
@@ -61,8 +64,13 @@ class MemosViewModel @Inject constructor(
 
     var memos = mutableStateListOf<MemoEntity>()
         private set
-    var tags = mutableStateListOf<String>()
-        private set
+    val tags: List<String> by derivedStateOf {
+        memos.asSequence()
+            .flatMap { extractCustomTags(it.content).asSequence() }
+            .filter { it.isNotBlank() }
+            .toSortedSet()
+            .toList()
+    }
     var errorMessage: String? by mutableStateOf(null)
         private set
     var matrix by mutableStateOf(DailyUsageStat.initialMatrix)
@@ -78,7 +86,13 @@ class MemosViewModel @Inject constructor(
         memoService.syncStatus.stateIn(viewModelScope, SharingStarted.Eagerly, SyncStatus())
 
     private val initialLoad = MutableStateFlow(false)
+    internal val initialLoadComplete = initialLoad.asStateFlow()
+    internal var initialSyncCompletedFor: String? by mutableStateOf(null)
+        private set
     private val commentRevisions = mutableStateMapOf<Pair<String, String>, Int>()
+    internal val commentPreviews = CommentPreviewCache { accountKey, parent ->
+        listMemoComments(accountKey, parent, COMMENT_PREVIEW_SIZE, null)
+    }
     private val spaceTitles = mutableStateMapOf<String, String>()
 
     fun spaceTitle(spaceName: String?): String? =
@@ -122,6 +136,7 @@ class MemosViewModel @Inject constructor(
         val repository = commentRepository(accountKey)
             ?: return@withContext ApiResponse.Failure.Exception(MeowmosException.notLogin)
         repository.createComment(parent, content, visibility, space).suspendOnSuccess {
+            commentPreviews.invalidate(accountKey, parent)
             commentRevisions[accountKey to parent] = commentRevision(accountKey, parent) + 1
         }
     }
@@ -159,12 +174,29 @@ class MemosViewModel @Inject constructor(
                 .map { it?.accountKey() }
                 .distinctUntilChanged()
                 .collectLatest {
+                    commentPreviews.clear()
                     spaceTitles.clear()
                     val repository = accountService.getRemoteRepository() as? MemosV1Repository ?: return@collectLatest
                     val spaces = repository.listSpaces().getOrNull().orEmpty()
                     spaces.forEach { space ->
                         if (space.title.isNotBlank()) {
                             spaceTitles[space.name] = space.title
+                        }
+                    }
+                }
+        }
+
+        viewModelScope.launch {
+            accountService.currentAccount
+                .map { it?.accountKey() }
+                .distinctUntilChanged()
+                .collectLatest { accountKey ->
+                    initialSyncCompletedFor = null
+                    if (accountKey != null) {
+                        try {
+                            syncMemosAutomatically()
+                        } finally {
+                            initialSyncCompletedFor = accountKey
                         }
                     }
                 }
@@ -197,20 +229,18 @@ class MemosViewModel @Inject constructor(
     }
 
     suspend fun loadMemos(syncAfterLoad: Boolean = true) = withContext(viewModelScope.coroutineContext) {
-        if (syncAfterLoad) {
-            val compatibility = accountService.checkCurrentAccountSyncCompatibility(isAutomatic = true)
-            if (compatibility !is AccountService.SyncCompatibility.Allowed) {
-                return@withContext
-            }
+        if (syncAfterLoad) syncMemosAutomatically()
+    }
 
-            val syncResult = memoService.sync(false)
-            if (syncResult is ApiResponse.Success) {
-                WidgetUpdater.updateWidgets(appContext)
-            } else {
-                if (!syncResult.isAccessTokenInvalidFailure()) {
-                    errorMessage = syncResult.getErrorMessage()
-                }
-            }
+    private suspend fun syncMemosAutomatically() {
+        val compatibility = accountService.checkCurrentAccountSyncCompatibility(isAutomatic = true)
+        if (compatibility !is AccountService.SyncCompatibility.Allowed) return
+
+        val syncResult = memoService.sync(false)
+        if (syncResult is ApiResponse.Success) {
+            WidgetUpdater.updateWidgets(appContext)
+        } else if (!syncResult.isAccessTokenInvalidFailure()) {
+            errorMessage = syncResult.getErrorMessage()
         }
     }
 
@@ -238,6 +268,7 @@ class MemosViewModel @Inject constructor(
             if (allowHigherV1Version != null) {
                 accountService.rememberAcceptedUnsupportedSyncVersion(allowHigherV1Version)
             }
+            commentPreviews.clear()
             WidgetUpdater.updateWidgets(appContext)
         } else {
             val message = syncResult.getErrorMessage()
@@ -249,13 +280,6 @@ class MemosViewModel @Inject constructor(
 
     private fun ApiResponse<Unit>.isAccessTokenInvalidFailure(): Boolean {
         return this is ApiResponse.Failure.Exception && this.throwable == MeowmosException.accessTokenInvalid
-    }
-
-    fun loadTags() = viewModelScope.launch {
-        memoService.getRepository().listTags().suspendOnSuccess {
-            tags.clear()
-            tags.addAll(data)
-        }
     }
 
     suspend fun updateMemoPinned(memoIdentifier: String, pinned: Boolean) = withContext(viewModelScope.coroutineContext) {

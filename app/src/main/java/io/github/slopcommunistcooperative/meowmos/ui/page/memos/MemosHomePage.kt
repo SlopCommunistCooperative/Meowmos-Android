@@ -2,16 +2,19 @@ package io.github.slopcommunistcooperative.meowmos.ui.page.memos
 
 import android.net.Uri
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -23,9 +26,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.slopcommunistcooperative.meowmos.R
@@ -53,7 +56,7 @@ fun MemosHomePage(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun MemosHomePageContent(
     showComposeFab: Boolean,
@@ -61,83 +64,78 @@ private fun MemosHomePageContent(
 ) {
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
-    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val rootNavController = LocalRootNavController.current
     val memosViewModel = LocalMemos.current
     val userStateViewModel = LocalUserState.current
     val currentAccount by userStateViewModel.currentAccount.collectAsStateWithLifecycle()
     val syncStatus by memosViewModel.syncStatus.collectAsStateWithLifecycle()
+    val initialLoadComplete by memosViewModel.initialLoadComplete.collectAsStateWithLifecycle()
+    val waitingForFirstMemos = !initialLoadComplete ||
+        (currentAccount != null && currentAccount !is Account.Local &&
+            (memosViewModel.initialSyncCompletedFor != currentAccount?.accountKey() || syncStatus.syncing))
 
     val expandedFab by remember {
         derivedStateOf {
             listState.firstVisibleItemIndex == 0
         }
     }
-    var syncAlert by remember { mutableStateOf<HomeSyncAlert?>(null) }
+    val snackbar = remember { SnackbarHostState() }
+    val retryLabel = stringResource(R.string.retry)
+    var syncAlert by remember { mutableStateOf<ManualSyncResult?>(null) }
+    var syncSource by remember { mutableStateOf<SyncSource?>(null) }
+    val remoteAccount = currentAccount != null && currentAccount !is Account.Local
+    val syncInProgress = syncSource != null || syncStatus.syncing
 
-    suspend fun requestManualSync(allowHigherV1Version: String? = null) {
-        when (val result = memosViewModel.refreshMemos(allowHigherV1Version)) {
+    suspend fun requestManualSync(source: SyncSource, allowHigherV1Version: String? = null) {
+        if (syncSource != null || memosViewModel.syncStatus.value.syncing) return
+        syncSource = source
+        val result = try {
+            memosViewModel.refreshMemos(allowHigherV1Version)
+        } finally {
+            syncSource = null
+        }
+        when (result) {
             ManualSyncResult.Completed -> Unit
-            is ManualSyncResult.Blocked -> {
-                syncAlert = HomeSyncAlert.Blocked(result.message)
-            }
-            is ManualSyncResult.RequiresConfirmation -> {
-                syncAlert = HomeSyncAlert.RequiresConfirmation(result.version, result.message)
-            }
-            is ManualSyncResult.Failed -> {
-                syncAlert = HomeSyncAlert.Failed(result.message)
+            is ManualSyncResult.Blocked, is ManualSyncResult.RequiresConfirmation -> syncAlert = result
+            is ManualSyncResult.Failed -> scope.launch {
+                snackbar.currentSnackbarData?.dismiss()
+                val action = snackbar.showSnackbar(result.message, retryLabel, duration = SnackbarDuration.Long)
+                if (action == SnackbarResult.ActionPerformed) requestManualSync(SyncSource.AppBar, allowHigherV1Version)
             }
         }
     }
 
     Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
             TopAppBar(
-                title = {
-                    Text(
-                        text = stringResource(R.string.memos),
-                        style = MaterialTheme.typography.titleLarge,
-                    )
-                },
+                title = { Text(stringResource(R.string.memos)) },
                 actions = {
-                    if (currentAccount !is Account.Local) {
+                    if (remoteAccount) {
                         SyncStatusBadge(
-                            syncing = syncStatus.syncing,
+                            syncing = syncInProgress && syncSource != SyncSource.Feed,
+                            enabled = !syncInProgress,
                             unsyncedCount = syncStatus.unsyncedCount,
-                            onSync = {
-                                scope.launch {
-                                    requestManualSync()
-                                }
-                            },
+                            onSync = { scope.launch { requestManualSync(SyncSource.AppBar) } },
                         )
                     }
                     ActionIconButton(
                         label = stringResource(R.string.search),
-                        onClick = {
-                            rootNavController.navigate(RouteName.SEARCH)
-                        },
+                        onClick = { rootNavController.navigate(RouteName.SEARCH) },
                     ) {
-                        Icon(
-                            imageVector = Icons.Filled.Search,
-                            contentDescription = stringResource(R.string.search),
-                        )
+                        Icon(ImageVector.vectorResource(R.drawable.symbol_search), contentDescription = null)
                     }
                 },
-                scrollBehavior = scrollBehavior,
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.surface,
-                    scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+                    scrolledContainerColor = MaterialTheme.colorScheme.surface,
                 ),
             )
         },
         floatingActionButton = {
             if (showComposeFab) {
                 ExtendedFloatingActionButton(
-                    onClick = {
-                        rootNavController.navigate(RouteName.INPUT)
-                    },
+                    onClick = { rootNavController.navigate(RouteName.INPUT) },
                     expanded = expandedFab,
                     shape = MaterialTheme.shapes.large,
                     containerColor = MeowmosTheme.colors.wayfindingContainer,
@@ -149,21 +147,24 @@ private fun MemosHomePageContent(
                     text = { Text(stringResource(R.string.new_memo)) },
                     icon = {
                         Icon(
-                            imageVector = Icons.Filled.Add,
+                            ImageVector.vectorResource(R.drawable.symbol_add),
                             contentDescription = stringResource(R.string.compose),
                         )
                     },
                 )
             }
         },
+        snackbarHost = { SnackbarHost(snackbar) },
         content = { innerPadding ->
             MemosList(
                 onMemoClick = onMemoClick,
                 lazyListState = listState,
                 contentPadding = innerPadding,
                 additionalBottomPadding = if (showComposeFab) MemoListFabAvoidancePadding else 20.dp,
-                onRefresh = { requestManualSync() },
+                onRefresh = { requestManualSync(SyncSource.Feed) },
+                refreshEnabled = remoteAccount && !syncInProgress,
                 showComments = true,
+                showInitialPlaceholder = waitingForFirstMemos,
                 onTagClick = { tag ->
                     rootNavController.navigate("${RouteName.TAG}/${Uri.encode(tag)}") {
                         launchSingleTop = true
@@ -175,30 +176,31 @@ private fun MemosHomePageContent(
     )
 
     when (val alert = syncAlert) {
-        null -> Unit
-        is HomeSyncAlert.Blocked -> {
+        null, ManualSyncResult.Completed, is ManualSyncResult.Failed -> Unit
+        is ManualSyncResult.Blocked -> {
             AlertDialog(
                 onDismissRequest = { syncAlert = null },
                 title = { Text(R.string.unsupported_memos_version_title.string) },
                 text = { Text(alert.message) },
                 confirmButton = {
-                    TextButton(onClick = { syncAlert = null }) {
+                    TextButton(onClick = { syncAlert = null }, shapes = ButtonDefaults.shapes()) {
                         Text(R.string.close.string)
                     }
                 },
             )
         }
-        is HomeSyncAlert.RequiresConfirmation -> {
+        is ManualSyncResult.RequiresConfirmation -> {
             AlertDialog(
                 onDismissRequest = { syncAlert = null },
                 title = { Text(R.string.unsupported_memos_version_title.string) },
                 text = { Text(alert.message) },
                 confirmButton = {
                     TextButton(
+                        shapes = ButtonDefaults.shapes(),
                         onClick = {
                             syncAlert = null
                             scope.launch {
-                                requestManualSync(allowHigherV1Version = alert.version)
+                                requestManualSync(SyncSource.AppBar, allowHigherV1Version = alert.version)
                             }
                         },
                     ) {
@@ -206,20 +208,8 @@ private fun MemosHomePageContent(
                     }
                 },
                 dismissButton = {
-                    TextButton(onClick = { syncAlert = null }) {
+                    TextButton(onClick = { syncAlert = null }, shapes = ButtonDefaults.shapes()) {
                         Text(R.string.cancel.string)
-                    }
-                },
-            )
-        }
-        is HomeSyncAlert.Failed -> {
-            AlertDialog(
-                onDismissRequest = { syncAlert = null },
-                title = { Text(R.string.sync_failed.string) },
-                text = { Text(alert.message) },
-                confirmButton = {
-                    TextButton(onClick = { syncAlert = null }) {
-                        Text(R.string.close.string)
                     }
                 },
             )
@@ -229,8 +219,4 @@ private fun MemosHomePageContent(
 
 private val MemoListFabAvoidancePadding = 96.dp
 
-private sealed class HomeSyncAlert {
-    data class Blocked(val message: String) : HomeSyncAlert()
-    data class RequiresConfirmation(val version: String, val message: String) : HomeSyncAlert()
-    data class Failed(val message: String) : HomeSyncAlert()
-}
+private enum class SyncSource { AppBar, Feed }

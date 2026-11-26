@@ -8,16 +8,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Explore
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
@@ -55,7 +56,7 @@ internal fun ExploreListContent(memos: LazyPagingItems<Memo>, contentPadding: Pa
         } else if (memos.itemCount == 0) {
             item(key = "empty") {
                 MeowmosEmptyState(
-                    icon = Icons.Outlined.Explore,
+                    icon = ImageVector.vectorResource(R.drawable.symbol_explore),
                     title = stringResource(R.string.no_memos),
                 )
             }
@@ -73,6 +74,7 @@ internal fun ExploreListContent(memos: LazyPagingItems<Memo>, contentPadding: Pa
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 internal fun PagingStatus(loadState: LoadState, onRetry: () -> Unit) {
     if (loadState is LoadState.NotLoading) return
@@ -84,7 +86,7 @@ internal fun PagingStatus(loadState: LoadState, onRetry: () -> Unit) {
     ) {
         when (loadState) {
             is LoadState.Loading -> {
-                CircularProgressIndicator()
+                LoadingIndicator()
                 Text(stringResource(R.string.loading))
             }
             is LoadState.Error -> {

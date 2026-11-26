@@ -1,5 +1,6 @@
 package io.github.slopcommunistcooperative.meowmos.ui.page.memos
 
+import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -30,18 +31,18 @@ fun MemosNavigation(
     val currentAccount by userStateViewModel.currentAccount.collectAsStateWithLifecycle()
     val hasExplore = currentAccount !is Account.Local
 
-    // Top-level bottom-bar / rail destinations use Material 3 fade-through motion rather than
-    // lateral push transitions.
+    val enterFade = tween<Float>(220, easing = TabEnterEasing)
+    val exitFade = tween<Float>(110)
     NavHost(
         navController = navController,
         startDestination = RouteName.MEMOS,
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.surface),
-        enterTransition = { fadeIn(animationSpec = tween(180)) },
-        exitTransition = { fadeOut(animationSpec = tween(140)) },
-        popEnterTransition = { fadeIn(animationSpec = tween(180)) },
-        popExitTransition = { fadeOut(animationSpec = tween(140)) },
+        enterTransition = { fadeIn(animationSpec = enterFade) },
+        exitTransition = { fadeOut(animationSpec = exitFade) },
+        popEnterTransition = { fadeIn(animationSpec = enterFade) },
+        popExitTransition = { fadeOut(animationSpec = exitFade) },
     ) {
         composable(RouteName.MEMOS) {
             MemosHomePage(
@@ -74,3 +75,5 @@ fun MemosNavigation(
         }
     }
 }
+
+private val TabEnterEasing = CubicBezierEasing(0.05f, 0.7f, 0.1f, 1f)

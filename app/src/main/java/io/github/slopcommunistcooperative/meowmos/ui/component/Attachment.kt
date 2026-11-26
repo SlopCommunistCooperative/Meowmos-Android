@@ -6,10 +6,6 @@ import android.content.Intent
 import android.webkit.MimeTypeMap
 import android.widget.Toast
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.OpenInNew
-import androidx.compose.material.icons.outlined.Attachment
-import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.DropdownMenu
@@ -23,7 +19,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.window.PopupProperties
 import androidx.core.net.toUri
 import com.skydoves.sandwich.ApiResponse
@@ -112,7 +110,7 @@ fun Attachment(
         label = { Text(resource.filename) },
         leadingIcon = {
             Icon(
-                Icons.Outlined.Attachment,
+                ImageVector.vectorResource(R.drawable.symbol_attachment),
                 contentDescription = R.string.attachment.string,
                 Modifier.size(AssistChipDefaults.IconSize)
             )
@@ -132,7 +130,7 @@ fun Attachment(
                 },
                 leadingIcon = {
                     Icon(
-                        Icons.AutoMirrored.Outlined.OpenInNew,
+                        ImageVector.vectorResource(R.drawable.symbol_open_in_new),
                         contentDescription = null
                     )
                 }
@@ -145,7 +143,7 @@ fun Attachment(
                 },
                 leadingIcon = {
                     Icon(
-                        Icons.Outlined.Delete,
+                        ImageVector.vectorResource(R.drawable.symbol_delete),
                         contentDescription = null
                     )
                 }

@@ -201,7 +201,7 @@ object AppLockAuthenticator {
 
 @Composable
 fun AppLockGate(
-    content: @Composable () -> Unit,
+    content: @Composable (dynamicColor: Boolean) -> Unit,
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -245,7 +245,7 @@ fun AppLockGate(
 
     val locked = appLockEnabled && (!AppLockSession.isUnlocked || pendingTimeoutLock)
     if (!locked) {
-        content()
+        content(settings.dynamicColorEnabled)
         return
     }
 
